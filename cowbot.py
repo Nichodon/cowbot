@@ -1,14 +1,15 @@
 import discord
 import asyncio
 from time import gmtime, strftime
+from discord.utils import *
 
 
 def compare(t, u):
     t1 = int(t[0][0]) * 60 + int(t[0][1])
     t2 = int(t[1][0]) * 60 + int(t[1][1])
     t3 = int(u[0]) * 60 + int(u[1])
-    if t1 < t2 < t3:
-        return t3 - t2
+    if t1 < t3 < t2:
+        return t2 - t3
     else:
         return -1
 
@@ -18,7 +19,7 @@ def zone(x):
 
 
 def last(x):
-    return int(x) < 8
+    return int(x) < 8 and not strftime("%p", gmtime()) == 'PM'
 
 
 def convert(x):
@@ -38,8 +39,9 @@ class Class(discord.Client):
                                               'type `//s m-d-y` or `//s today`. ' + 'Example: `//s 3-26-18`',
                                   colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'Help:', embed=embed)
-        elif message.content.startswith('//g'):
-            pass
+        elif message.content.startswith('//r '):
+            thing = message.content.split('//r ')[1]
+            yield from client.send_message(message.channel, 'hi')
         elif message.content.startswith('//s '):
             date = message.content.split('//s ')[1]
             if date == 'today':
