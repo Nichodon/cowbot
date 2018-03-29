@@ -48,7 +48,7 @@ class Class(discord.Client):
             split = date.split('-')
             split = [str(int(x)) for x in split]
 
-            if last(strftime("%I", gmtime())):
+            if last(strftime("%I", gmtime())) and message.content == '//s today':
                 split[1] = str(int(split[1]) - 1)
 
             periods = ''
@@ -68,11 +68,12 @@ class Class(discord.Client):
                         span = line.split('(')[1].split(')')[0]
                         times += span + '\n'
                         until = compare(convert(span), now)
-                        left = 'Period ends in ' + str(until) + ' minutes.' if until > -1 else left
+                        if message.content == '//s today':
+                            left = 'Period ends in ' + str(until) + ' minutes.' if until > -1 else left
 
             embed = discord.Embed(title=split[0] + '/' + split[1] + '/' + split[2] + ', ' + now[0] + ':' + now[1],
                                   description=left, colour=discord.Colour(0xff0066))
-            embed.set_footer(text='by Brandon, plagiarised from Timothy')
+            embed.set_footer(text='By Brandon, txt file provided by Timothy.')
             embed.set_author(name='CowBot Gunn Schedule')
             embed.add_field(name='Periods', value=periods, inline=True)
             embed.add_field(name='Times', value=times, inline=True)
