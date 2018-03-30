@@ -35,13 +35,21 @@ class Class(discord.Client):
     @asyncio.coroutine
     def on_message(self, message):
         if message.content.startswith('//help'):
-            embed = discord.Embed(description='Schedule: To see a schedule for a certain date,' +
-                                              'type `//s m-d-y` or `//s today`. ' + 'Example: `//s 3-26-18`',
+            embed = discord.Embed(description='Schedule: `//s m-d-y` or `//s today`. Example: `//s 3-26-18`\n\n' +
+                                              'Indented Text: `//e text` or `//e c=color text`. Color is 6-digit hex.' +
+                                              ' Example: `//e c=00cc99 Hello`. I am some indented text!!',
                                   colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'Help:', embed=embed)
-        elif message.content.startswith('//r '):
-            thing = message.content.split('//r ')[1]
-            yield from client.send_message(message.channel, 'hi')
+        elif message.content.startswith('//e '):
+            thing = message.content.split('//e ')[1]
+            color = '0099cc'
+            if thing.startswith('c='):
+                color = thing.split(' ')[0][2:]
+                thing = thing[9:]
+            embed = discord.Embed(colour=discord.Colour(int(color, 16)))
+            embed.add_field(name=message.author.name + ' says:', value=thing, inline=True)
+
+            yield from client.send_message(message.channel, '**Announcement**', embed=embed)
         elif message.content.startswith('//s '):
             date = message.content.split('//s ')[1]
             if date == 'today':
