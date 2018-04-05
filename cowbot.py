@@ -4,6 +4,11 @@ from time import gmtime, strftime
 from discord.utils import *
 
 
+schedule = []
+with open('schedules.txt', 'r') as f:
+    schedule = f.readlines()
+
+
 def compare(t, u):
     t1 = int(t[0][0]) * 60 + int(t[0][1])
     t2 = int(t[1][0]) * 60 + int(t[1][1])
@@ -49,6 +54,7 @@ class Class(discord.Client):
             embed = discord.Embed(colour=discord.Colour(int(color, 16)))
             embed.add_field(name=message.author.name + ' says:', value=thing, inline=True)
 
+            yield from client.delete_message(message)
             yield from client.send_message(message.channel, '**Announcement**', embed=embed)
         elif message.content.startswith('//s '):
             date = message.content.split('//s ')[1]
@@ -66,20 +72,25 @@ class Class(discord.Client):
             left = 'Nothing is happening right now...'
             now = [zone(strftime("%I", gmtime())), strftime("%M", gmtime())]
 
-            with open('schedules.txt', 'r') as f:
-                do = False
-                for line in f.readlines():
-                    if line.startswith('$$'):
-                        do = False
-                    if line == '$$' + split[0] + '/' + split[1] + '/' + split[2] + '\n':
-                        do = True
-                    elif do:
-                        periods += line.split('[')[1].split(']')[0] + '\n'
-                        span = line.split('(')[1].split(')')[0]
-                        times += span + '\n'
-                        until = compare(convert(span), now)
-                        if message.content == '//s today':
-                            left = 'Period ends in ' + str(until) + ' minutes.' if until > -1 else left
+            do = False
+            for line in schedule:
+                if line.startswith('$$'):
+                    do = False
+                if line == '$$' + split[0] + '/' + split[1] + '/' + split[2] + '\n':
+                    do = True
+                elif do:
+                    if line == 'None\n':
+                        yield from client.send_message(message.channel, 'Nothing for that day!')
+                        return
+                    elif line == 'Default\n':
+                        yield from client.send_message(message.channel, 'Regular schdule that day!')
+                        return
+                    periods += line.split('[')[1].split(']')[0] + '\n'
+                    span = line.split('(')[1].split(')')[0]
+                    times += span + '\n'
+                    until = compare(convert(span), now)
+                    if message.content == '//s today':
+                        left = 'Period ends in ' + str(until) + ' minutes.' if until > -1 else left
 
             embed = discord.Embed(title=split[0] + '/' + split[1] + '/' + split[2] + ', ' + now[0] + ':' + now[1],
                                   description=left, colour=discord.Colour(0xff0066))
