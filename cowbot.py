@@ -109,15 +109,26 @@ class Class(discord.Client):
             put.close()
 
         elif message.content.startswith('//help'):
-            embed = discord.Embed(description='Schedule: `//s m-d-y` or `//s today`. Example: `//s 3-26-18`\n\n' +
-                                              'Indented Text: `//e text` or `//e c=color text`. Color is 6-digit hex.' +
-                                              ' Example: `//e c=00cc99 Hello`. I am some indented text!!',
+            embed = discord.Embed(description='**Schedule**: `//s m-d-y` or `//s today`. Example: `//s 3-26-18`\n\n' +
+                                              '**Indented Text**: `//e text` or `//e c=color text`. Color is 6-digit ' +
+                                              'hex. Example: `//e c=00cc99 Hello. I am some indented text!`\n\n' +
+                                              '**Poll**: `//poll`. Example: `//poll Should we buy one or two cows?`',
                                   colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
-        elif message.content.startswith('//close'):
-            client.logout()
+        elif message.content.startswith('//poll'):
+            yield from client.add_reaction(message, '\u0030\u20e3')
+            yield from client.add_reaction(message, '\u0031\u20e3')
+            yield from client.add_reaction(message, '\u0032\u20e3')
+            yield from client.add_reaction(message, '\u0033\u20e3')
+            yield from client.add_reaction(message, '\u0034\u20e3')
+            yield from client.add_reaction(message, '\u0035\u20e3')
+            yield from client.add_reaction(message, '\u0036\u20e3')
+            yield from client.add_reaction(message, '\u0037\u20e3')
+            yield from client.add_reaction(message, '\u0038\u20e3')
+            yield from client.add_reaction(message, '\u0039\u20e3')
+            yield from client.add_reaction(message, '\U0001f51f')
         elif message.content.startswith('//last'):
             with open('data.txt') as thing:
                 yield from client.send_message(message.channel, thing.read())
