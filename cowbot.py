@@ -38,6 +38,10 @@ def convert(x):
 class Class(discord.Client):
 
     @asyncio.coroutine
+    def on_ready(self):
+        yield from client.change_presence(game=discord.Game(name='//help'))
+
+    @asyncio.coroutine
     def on_message(self, message):
 
         # Datum syntax
