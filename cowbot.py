@@ -39,12 +39,51 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
-        if message.content.startswith('//help'):
+
+        # Datum syntax
+        # 0: Player name
+        # 1: Size
+
+        if message.content.startswith('//cow'):
+            command = message.content.split(' ')[1]
+            with open('data.txt') as thing:
+                contents = thing.readlines()
+            found = False
+            output = ''
+            for line in contents:
+                datum = line.split(':')
+                if datum[0] == message.author.name:
+                    if command == 'buy':
+                        output += line
+                        yield from client.send_message(message.channel, 'You already have a cow!')
+                        found = True
+                    elif command == 'feed':
+                        output += datum[0] + ':' + str(int(datum[1]) + 5) + ':\n'
+                        yield from client.send_message(message.channel, 'You fed your cow.')
+                    elif command == 'sell':
+                        yield from client.send_message(message.channel, 'You sold your cow. :(')
+                else:
+                    output += line
+            if command == 'buy' and not found:
+                output += message.author.name + ':10:\n'
+                yield from client.send_message(message.channel, 'You bought a cow. :)')
+            out = open('data.txt', 'w')
+            out.write(output)
+            out.close()
+
+        elif message.content.startswith('//help'):
             embed = discord.Embed(description='Schedule: `//s m-d-y` or `//s today`. Example: `//s 3-26-18`\n\n' +
                                               'Indented Text: `//e text` or `//e c=color text`. Color is 6-digit hex.' +
                                               ' Example: `//e c=00cc99 Hello`. I am some indented text!!',
                                   colour=discord.Colour(0x00cc99))
-            yield from client.send_message(message.channel, 'Help:', embed=embed)
+            yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
+                                           'probably in a channel that does not allow bots. Please go to another' +
+                                           'channel that allows bots.', embed=embed)
+        elif message.content.startswith('//close'):
+            client.logout()
+        elif message.content.startswith('//last'):
+            with open('data.txt') as thing:
+                yield from client.send_message(message.channel, thing.read())
         elif message.content.startswith('//e '):
             thing = message.content.split('//e ')[1]
             color = '0099cc'
@@ -83,7 +122,7 @@ class Class(discord.Client):
                         yield from client.send_message(message.channel, 'Nothing for that day!')
                         return
                     elif line == 'Default\n':
-                        yield from client.send_message(message.channel, 'Regular schdule that day!')
+                        yield from client.send_message(message.channel, 'Regular schedule that day!')
                         return
                     periods += line.split('[')[1].split(']')[0] + '\n'
                     span = line.split('(')[1].split(')')[0]
