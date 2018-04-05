@@ -2,9 +2,9 @@ import discord
 import asyncio
 from time import gmtime, strftime
 from discord.utils import *
+import random
 
 
-schedule = []
 with open('schedules.txt', 'r') as f:
     schedule = f.readlines()
 
@@ -48,8 +48,13 @@ class Class(discord.Client):
             command = message.content.split(' ')[1]
             with open('data.txt') as thing:
                 contents = thing.readlines()
+            with open('money.txt') as bank:
+                money = bank.readlines()
+
             found = False
             output = ''
+            going = ''
+
             for line in contents:
                 datum = line.split(':')
                 if datum[0] == message.author.name:
@@ -58,18 +63,50 @@ class Class(discord.Client):
                         yield from client.send_message(message.channel, 'You already have a cow!')
                         found = True
                     elif command == 'feed':
-                        output += datum[0] + ':' + str(int(datum[1]) + 5) + ':\n'
-                        yield from client.send_message(message.channel, 'You fed your cow.')
+                        amount = random.randint(5, 10)
+                        if int(datum[1]) + amount < 50:
+                            output += datum[0] + ':' + str(int(datum[1]) + amount) + ':\n'
+                            yield from client.send_message(message.channel, 'You fed your cow.')
+                        else:
+                            yield from client.send_message(message.channel, 'Your cow exploded!!')
+                    elif command == 'size':
+                        output += line
+                        if int(datum[1]) > 40:
+                            yield from client.send_message(message.channel, 'Your cow is extreme obese!!')
+                        elif int(datum[1]) > 30:
+                            yield from client.send_message(message.channel, 'Your cow is pretty fat!')
+                        elif int(datum[1]) > 20:
+                            yield from client.send_message(message.channel, 'Your cow is looking a bit big.')
+                        elif int(datum[1]) > 10:
+                            yield from client.send_message(message.channel, 'Your cow is a tad small.')
+                        else:
+                            yield from client.send_message(message.channel, 'Your cow is starving!')
                     elif command == 'sell':
                         yield from client.send_message(message.channel, 'You sold your cow. :(')
                 else:
                     output += line
+
             if command == 'buy' and not found:
+                got = False
+                for stuff in money:
+                    datum = stuff.split(':')
+                    if datum[0] == message.author.name:
+                        going += datum[0] + ':' + str(int(datum[1]) - 15) + ':\n'
+                        got = True
+                    else:
+                        going += stuff
+                if not got:
+                    going += message.author.name + ':85:\n'
                 output += message.author.name + ':10:\n'
-                yield from client.send_message(message.channel, 'You bought a cow. :)')
+                yield from client.send_message(message.channel, 'You bought a cow for 15cw. :)')
+
             out = open('data.txt', 'w')
             out.write(output)
             out.close()
+
+            put = open('money.txt', 'w')
+            put.write(going)
+            put.close()
 
         elif message.content.startswith('//help'):
             embed = discord.Embed(description='Schedule: `//s m-d-y` or `//s today`. Example: `//s 3-26-18`\n\n' +
@@ -77,8 +114,8 @@ class Class(discord.Client):
                                               ' Example: `//e c=00cc99 Hello`. I am some indented text!!',
                                   colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
-                                           'probably in a channel that does not allow bots. Please go to another' +
-                                           'channel that allows bots.', embed=embed)
+                                           ' probably in a channel that does not allow bots. Please go to another' +
+                                           ' channel that allows bots.', embed=embed)
         elif message.content.startswith('//close'):
             client.logout()
         elif message.content.startswith('//last'):
