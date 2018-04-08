@@ -139,17 +139,17 @@ class Class(discord.Client):
         elif message.content.startswith('//last'):
             with open('data.txt') as thing:
                 yield from client.send_message(message.channel, thing.read())
-        elif message.content.startswith('//e '):
-            thing = message.content.split('//e ')[1]
-            color = '0099cc'
+        elif message.content.startswith('//indent '):
+            thing = message.content.split('//indent ')[1]
+            color = '00cc99'
             if thing.startswith('c='):
                 color = thing.split(' ')[0][2:]
                 thing = thing[9:]
             embed = discord.Embed(colour=discord.Colour(int(color, 16)))
             embed.add_field(name=message.author.name + ' says:', value=thing, inline=True)
 
-            yield from client.delete_message(message)
             yield from client.send_message(message.channel, '**Announcement**', embed=embed)
+            yield from client.delete_message(message)
         elif message.content.startswith('//s '):
             date = message.content.split('//s ')[1]
             if date == 'today':
