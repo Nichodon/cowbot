@@ -121,7 +121,7 @@ class Class(discord.Client):
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
-        elif message.content.startswith('//poll'):
+        elif message.content.startswith('//poll num '):
             yield from client.add_reaction(message, '\u0030\u20e3')
             yield from client.add_reaction(message, '\u0031\u20e3')
             yield from client.add_reaction(message, '\u0032\u20e3')
@@ -133,6 +133,9 @@ class Class(discord.Client):
             yield from client.add_reaction(message, '\u0038\u20e3')
             yield from client.add_reaction(message, '\u0039\u20e3')
             yield from client.add_reaction(message, '\U0001f51f')
+        elif message.content.startswith('//poll '):
+            yield from client.add_reaction(message, '\u2705')
+            yield from client.add_reaction(message, '\u274e')
         elif message.content.startswith('//last'):
             with open('data.txt') as thing:
                 yield from client.send_message(message.channel, thing.read())
