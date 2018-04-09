@@ -4,6 +4,9 @@ from time import gmtime, strftime
 from discord.utils import *
 import random
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 
 with open('schedules.txt', 'r') as f:
     schedule = f.readlines()
