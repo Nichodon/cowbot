@@ -128,6 +128,19 @@ class Class(discord.Client):
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
+        elif message.content.startswith('//covfefe '):
+            target = message.content.split('//covfefe ')[1]
+            with open('covfefe.txt') as covfefe:
+                lines = covfefe.readlines()
+                tweet = discord.Embed(title='',
+                                      description=lines[random.randint(0, 19)].replace('[]', target) + '\n\n' +
+                                                  '\U0001f5e8\ufe0f ' + str(random.randint(10, 50)) + 'K   ' +
+                                                  '\U0001F503 ' + str(random.randint(10, 50)) + 'K   ' +
+                                                  '\U0001F499 ' + str(random.randint(50, 250)) + 'K')
+                tweet.set_author(name='Donald J. Trump @realDonaldTrump',
+                                 icon_url='https://pbs.twimg.com/profile_images/' +
+                                          '874276197357596672/kUuht00m_400x400.jpg')
+                yield from client.send_message(message.channel, 'Someone just got covfefed:', embed=tweet)
         elif message.content.startswith('//poll num '):
             yield from client.add_reaction(message, '\u0030\u20e3')
             yield from client.add_reaction(message, '\u0031\u20e3')
