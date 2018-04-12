@@ -58,61 +58,89 @@ class Class(discord.Client):
             with open('money.txt') as bank:
                 money = bank.readlines()
 
+            dollars = 0
+
+            found = False
+            going = []
+            for stuff in money:
+                datum = stuff.split(':')
+                if datum[1] == message.author.name:
+                    going.append(stuff)
+                    dollars = int(datum[2])
+                    found = True
+                else:
+                    going.append(stuff)
+            if not found:
+                dollars = 0
+                going.append(':' + message.author.name + ':0:\n')
+
             found = False
             output = ''
-            going = ''
 
             for line in contents:
                 datum = line.split(':')
-                if datum[0] == message.author.name:
+                if datum[1] == message.author.name:
                     if command == 'buy':
                         output += line
+
                         yield from client.send_message(message.channel, 'You already have a cow!')
                         found = True
-                    elif command == 'feed':
+                    elif command == 'feed' and dollars > 4:
+                        dollars -= 5
+
                         amount = random.randint(5, 10)
-                        if int(datum[1]) + amount < 50:
-                            output += datum[0] + ':' + str(int(datum[1]) + amount) + ':\n'
+                        if int(datum[2]) + amount < 50:
+                            output += ':' + message.author.name + ':' + str(int(datum[2]) + amount) + ':\n'
+
                             yield from client.send_message(message.channel, 'You fed your cow.')
                         else:
                             yield from client.send_message(message.channel, 'Your cow exploded!!')
+
                     elif command == 'size':
                         output += line
-                        if int(datum[1]) > 40:
+
+                        if int(datum[2]) > 40:
                             yield from client.send_message(message.channel, 'Your cow is extreme obese!!')
-                        elif int(datum[1]) > 30:
+                        elif int(datum[2]) > 30:
                             yield from client.send_message(message.channel, 'Your cow is pretty fat!')
-                        elif int(datum[1]) > 20:
+                        elif int(datum[2]) > 20:
                             yield from client.send_message(message.channel, 'Your cow is looking a bit big.')
-                        elif int(datum[1]) > 10:
+                        elif int(datum[2]) > 10:
                             yield from client.send_message(message.channel, 'Your cow is a tad small.')
                         else:
                             yield from client.send_message(message.channel, 'Your cow is starving!')
                     elif command == 'sell':
-                        yield from client.send_message(message.channel, 'You sold your cow. :(')
+                        dollars += 490 + int(datum[2])
+
+                        yield from client.send_message(message.channel, 'You sold your cow for ' +
+                                                       str(490 + int(datum[2])) + 'cb. :(')
                 else:
                     output += line
 
-            if command == 'buy' and not found:
-                got = False
-                for stuff in money:
-                    datum = stuff.split(':')
-                    if datum[0] == message.author.name:
-                        going += datum[0] + ':' + str(int(datum[1]) - 15) + ':\n'
-                        got = True
+            if not found:
+                if command == 'buy':
+                    if dollars > 499:
+                        dollars -= 500
+                        output += ':' + message.author.name + ':10:\n'
+
+                        yield from client.send_message(message.channel, 'You bought a cow for 500cb. :)')
                     else:
-                        going += stuff
-                if not got:
-                    going += message.author.name + ':85:\n'
-                output += message.author.name + ':10:\n'
-                yield from client.send_message(message.channel, 'You bought a cow for 15cw. :)')
+                        yield from client.send_message(message.channel, 'You can\'t afford a cow!')
 
             out = open('data.txt', 'w')
             out.write(output)
             out.close()
 
+            again = ''
+            for stuff in going:
+                datum = stuff.split(':')
+                if datum[1] == message.author.name:
+                    again += ':' + message.author.name + ':' + str(dollars) + ':\n'
+                else:
+                    again += stuff
+
             put = open('money.txt', 'w')
-            put.write(going)
+            put.write(again)
             put.close()
 
         elif message.content.startswith('//help'):
