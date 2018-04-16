@@ -3,6 +3,7 @@ import asyncio
 from time import gmtime, strftime
 from discord.utils import *
 import random
+import re
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -38,14 +39,128 @@ def convert(x):
     return out
 
 
+ER_DESIRED = 0.005
+# Desired 1cb = Xu
+
+ER_MAX = 0.5
+# Highest 1cb = Xu
+
+TOTAL_NORMAL = 20000000
+# Normal bot total
+
+TOTAL_MONEY = 0
+TOTAL_UN = TOTAL_NORMAL / ER_DESIRED
+GOV_MONEY = TOTAL_UN / ER_MAX
+ER_UN = 0
+
+
+def universal():
+    global TOTAL_MONEY
+    global ER_UN
+
+    total = 0
+    with open('money.txt') as bank:
+        money = bank.readlines()
+
+    for stuff in money:
+        datum = stuff.split(':')
+        total += int(datum[2])
+
+    TOTAL_MONEY = total / 100
+    ER_UN = 1 / (GOV_MONEY + TOTAL_MONEY) * TOTAL_UN
+
+
 class Class(discord.Client):
+
+    waiting = False
 
     @asyncio.coroutine
     def on_ready(self):
-        yield from client.change_presence(game=discord.Game(name='//help'))
+        yield from client.change_presence(game=discord.Game(name='Being worked on right now, some things might be broken!'))
 
     @asyncio.coroutine
     def on_message(self, message):
+        if message.content.startswith('//echo '):
+            yield from client.send_message(message.channel, message.content.split('//echo ')[1])
+        if not message.author.bot and message.content.startswith('//convert '):
+            data = message.content.split(' ')
+            amount = float(data[2])
+
+            with open('money.txt') as bank:
+                money = bank.readlines()
+
+            found = False
+            for stuff in money:
+                datum = stuff.split(':')
+                if datum[1] == message.author.name:
+                    if int(datum[2]) < amount:
+                        yield from client.send_message(message.channel, 'You are too poor for that!')
+                        return
+                    found = True
+            if not found:
+                yield from client.send_message(message.channel, 'You are too poor for that!')
+                return
+
+            bot = discord.User()
+            if data[1] == 'mn':
+                bot = yield from client.get_user_info('427609586032443392')
+            elif data[1] == 'bcbw':
+                bot = yield from client.get_user_info('393248490739859458')
+            universal()
+            amount *= ER_UN
+            embed = discord.Embed(title='convert',
+                                  description='<@' + message.author.id + '> ' + str(amount))
+            yield from client.send_message(message.channel, bot.mention, embed=embed)
+
+            success = yield from client.wait_for_reaction(emoji="👌", user=bot, timeout=15)
+            if not success:
+                yield from client.send_message(message.channel,
+                                               bot.mention + ' did not respond, so no conversion was made.')
+            else:
+                yield from client.send_message(message.channel, 'Cool.')
+
+                again = ''
+                for stuff in money:
+                    datum = stuff.split(':')
+                    if datum[1] == message.author.name:
+                        again += ':' + message.author.name + ':' + str(int(datum[2]) - int(data[2])) + ':\n'
+                    else:
+                        again += stuff
+
+                put = open('money.txt', 'w')
+                put.write(again)
+                put.close()
+        if len(message.mentions) > 0:
+            if message.author.name != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
+                yield from client.send_message(message.channel, 'Hi! Do `//help` for a list of commands.')
+            elif message.author.name != 'cowbot' and message.mentions[0].name == 'cowbot':
+                if message.embeds[0]["title"] == 'convert':
+                    regex = re.compile(r'<@!?(\d+)>')
+                    user = yield from client.get_user_info(regex.search(message.embeds[0]["description"]).group(1))
+                    amount = float(message.embeds[0]["description"].split(' ')[1])
+                    universal()
+                    amount /= ER_UN
+
+                    with open('money.txt') as bank:
+                        money = bank.readlines()
+
+                    found = False
+                    again = ''
+                    for stuff in money:
+                        datum = stuff.split(':')
+                        if datum[1] == user.name:
+                            again += ':' + user.name + ':' + str(int(datum[2]) + amount) + ':\n'
+                            found = True
+                        else:
+                            again += stuff
+                    if not found:
+                        again += ':' + user.name + ':' + str(amount) + ':\n'
+
+                    put = open('money.txt', 'w')
+                    put.write(again)
+                    put.close()
+
+                    yield from client.add_reaction(message, '\U0001F44C')
 
         # Datum syntax
         # 0: Player name
