@@ -39,6 +39,42 @@ def convert(x):
     return out
 
 
+def bank_get(user):
+    with open('money.txt') as bank:
+        money = bank.readlines()
+
+    found = False
+    for stuff in money:
+        datum = stuff.split(':')
+        if datum[1] == user:
+            print(datum[2])
+            return float(datum[2])
+    if not found:
+        print(0)
+        return 0
+
+
+def bank_set(user, amount):
+    with open('money.txt') as bank:
+        money = bank.readlines()
+
+    found = False
+    again = ''
+    for stuff in money:
+        datum = stuff.split(':')
+        if datum[1] == user:
+            again += ':' + user + ':' + str(float(datum[2]) + amount) + ':\n'
+            found = True
+        else:
+            again += stuff
+    if not found:
+        again += ':' + user + ':' + str(amount) + ':\n'
+
+    put = open('money.txt', 'w')
+    put.write(again)
+    put.close()
+
+
 ER_DESIRED = 0.005
 # Desired 1cb = Xu
 
