@@ -116,24 +116,22 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
-        if message.content.startswith('//echo '):
+        if message.content.startswith('//bank ') and len(message.mentions) > 0:
+            yield from client.send_message(message.channel,
+                                           message.mentions[0].name + ' has ' + str(bank_get(message.mentions[0].name))
+                                           + 'cb')
+
+        elif message.content.startswith('//echo '):
+            if message.content.split('//echo ')[1] == '':
+                yield from client.send_message(message.channel, 'Er, that\'s a bad echo.')
+                return
             yield from client.send_message(message.channel, message.content.split('//echo ')[1])
-        if not message.author.bot and message.content.startswith('//convert '):
+
+        elif not message.author.bot and message.content.startswith('//convert '):
             data = message.content.split(' ')
             amount = float(data[2])
 
-            with open('money.txt') as bank:
-                money = bank.readlines()
-
-            found = False
-            for stuff in money:
-                datum = stuff.split(':')
-                if datum[1] == message.author.name:
-                    if int(datum[2]) < amount:
-                        yield from client.send_message(message.channel, 'You are too poor for that!')
-                        return
-                    found = True
-            if not found:
+            if bank_get(message.author.name) < amount:
                 yield from client.send_message(message.channel, 'You are too poor for that!')
                 return
 
@@ -155,19 +153,9 @@ class Class(discord.Client):
                 yield from client.send_message(message.channel,
                                                bot.mention + ' did not respond, so no conversion was made.')
             else:
-                yield from client.send_message(message.channel, 'Cool.')
+                yield from client.send_message(message.channel, 'A conversion was made!')
+                bank_set(message.author.name, -float(data[2]))
 
-                again = ''
-                for stuff in money:
-                    datum = stuff.split(':')
-                    if datum[1] == message.author.name:
-                        again += ':' + message.author.name + ':' + str(int(datum[2]) - int(data[2])) + ':\n'
-                    else:
-                        again += stuff
-
-                put = open('money.txt', 'w')
-                put.write(again)
-                put.close()
         if len(message.mentions) > 0:
             if message.author.name != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
                 yield from client.send_message(message.channel, 'Hi! Do `//help` for a list of commands.')
@@ -180,24 +168,7 @@ class Class(discord.Client):
                     universal()
                     amount /= ER_UN
 
-                    with open('money.txt') as bank:
-                        money = bank.readlines()
-
-                    found = False
-                    again = ''
-                    for stuff in money:
-                        datum = stuff.split(':')
-                        if datum[1] == user.name:
-                            again += ':' + user.name + ':' + str(int(datum[2]) + amount) + ':\n'
-                            found = True
-                        else:
-                            again += stuff
-                    if not found:
-                        again += ':' + user.name + ':' + str(amount) + ':\n'
-
-                    put = open('money.txt', 'w')
-                    put.write(again)
-                    put.close()
+                    bank_set(user.name, amount)
 
                     yield from client.add_reaction(message, '\U0001F44C')
 
@@ -209,27 +180,11 @@ class Class(discord.Client):
             command = message.content.split(' ')[1]
             with open('data.txt') as thing:
                 contents = thing.readlines()
-            with open('money.txt') as bank:
-                money = bank.readlines()
-
-            dollars = 0
-
-            found = False
-            going = []
-            for stuff in money:
-                datum = stuff.split(':')
-                if datum[1] == message.author.name:
-                    going.append(stuff)
-                    dollars = int(datum[2])
-                    found = True
-                else:
-                    going.append(stuff)
-            if not found:
-                dollars = 0
-                going.append(':' + message.author.name + ':0:\n')
 
             found = False
             output = ''
+
+            temp_dollars = bank_get(message.author.name)
 
             for line in contents:
                 datum = line.split(':')
@@ -239,8 +194,8 @@ class Class(discord.Client):
 
                         yield from client.send_message(message.channel, 'You already have a cow!')
                         found = True
-                    elif command == 'feed' and dollars > 4:
-                        dollars -= 5
+                    elif command == 'feed' and temp_dollars > 4:
+                        temp_dollars -= 5
 
                         amount = random.randint(5, 10)
                         if int(datum[2]) + amount < 50:
@@ -264,7 +219,7 @@ class Class(discord.Client):
                         else:
                             yield from client.send_message(message.channel, 'Your cow is starving!')
                     elif command == 'sell':
-                        dollars += 490 + int(datum[2])
+                        temp_dollars += 490 + int(datum[2])
 
                         yield from client.send_message(message.channel, 'You sold your cow for ' +
                                                        str(490 + int(datum[2])) + 'cb. :(')
@@ -273,8 +228,8 @@ class Class(discord.Client):
 
             if not found:
                 if command == 'buy':
-                    if dollars > 499:
-                        dollars -= 500
+                    if temp_dollars > 499:
+                        temp_dollars -= 500
                         output += ':' + message.author.name + ':10:\n'
 
                         yield from client.send_message(message.channel, 'You bought a cow for 500cb. :)')
@@ -285,17 +240,7 @@ class Class(discord.Client):
             out.write(output)
             out.close()
 
-            again = ''
-            for stuff in going:
-                datum = stuff.split(':')
-                if datum[1] == message.author.name:
-                    again += ':' + message.author.name + ':' + str(dollars) + ':\n'
-                else:
-                    again += stuff
-
-            put = open('money.txt', 'w')
-            put.write(again)
-            put.close()
+            bank_set(message.author.name, temp_dollars - bank_get(message.author.name))
 
         elif message.content.startswith('//help'):
             embed = discord.Embed(description='**Schedule**: `//s <date>`\n' +
