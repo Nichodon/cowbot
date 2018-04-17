@@ -112,7 +112,7 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_ready(self):
-        yield from client.change_presence(game=discord.Game(name='Being worked on right now, some things might be broken!'))
+        yield from client.change_presence(game=discord.Game(name='//help | In development! Things might break!'))
 
     @asyncio.coroutine
     def on_message(self, message):
@@ -132,7 +132,7 @@ class Class(discord.Client):
             amount = float(data[2])
 
             if bank_get(message.author.name) < amount:
-                yield from client.send_message(message.channel, 'You are too poor for that!')
+                yield from client.send_message(message.channel, 'You are too poor to make that conversion.')
                 return
 
             bot = discord.User()
@@ -172,12 +172,9 @@ class Class(discord.Client):
 
                     yield from client.add_reaction(message, '\U0001F44C')
 
-        # Datum syntax
-        # 0: Player name
-        # 1: Size
-
         if message.content.startswith('//cow'):
             command = message.content.split(' ')[1]
+            print(command)
             with open('data.txt') as thing:
                 contents = thing.readlines()
 
@@ -203,7 +200,7 @@ class Class(discord.Client):
 
                             yield from client.send_message(message.channel, 'You fed your cow.')
                         else:
-                            yield from client.send_message(message.channel, 'Your cow exploded!!')
+                            yield from client.send_message(message.channel, 'You are too poor to feed your cow.')
 
                     elif command == 'size':
                         output += line
@@ -234,7 +231,7 @@ class Class(discord.Client):
 
                         yield from client.send_message(message.channel, 'You bought a cow for 500cb. :)')
                     else:
-                        yield from client.send_message(message.channel, 'You can\'t afford a cow!')
+                        yield from client.send_message(message.channel, 'You are too poor to buy a cow.')
 
             out = open('data.txt', 'w')
             out.write(output)
