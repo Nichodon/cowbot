@@ -100,7 +100,7 @@ def universal():
 
     for stuff in money:
         datum = stuff.split(':')
-        total += int(datum[2])
+        total += float(datum[2])
 
     TOTAL_MONEY = total / 100
     ER_UN = 1 / (GOV_MONEY + TOTAL_MONEY) * TOTAL_UN
@@ -142,8 +142,10 @@ class Class(discord.Client):
                 bot = yield from client.get_user_info('427609586032443392')
             elif data[1] == 'bcbw':
                 bot = yield from client.get_user_info('393248490739859458')
+
             universal()
             amount *= ER_UN
+
             embed = discord.Embed(title='convert',
                                   description='<@' + message.author.id + '> ' + str(amount))
             yield from client.send_message(message.channel, bot.mention, embed=embed)
@@ -169,6 +171,7 @@ class Class(discord.Client):
         if len(message.mentions) > 0:
             if message.author.name != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
                 yield from client.send_message(message.channel, 'Hi! Do `//help` for a list of commands.')
+
             elif message.author.name != 'cowbot' and message.mentions[0].name == 'cowbot':
                 if message.embeds[0]["title"] == 'convert':
                     regex = re.compile(r'<@!?(\d+)>')
