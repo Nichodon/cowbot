@@ -192,13 +192,16 @@ class Class(discord.Client):
                         yield from client.send_message(message.channel, 'You already have a cow!')
                         found = True
                     elif command == 'feed' and temp_dollars > 4:
-                        temp_dollars -= 5
+                        if temp_dollars < 4:
+                            temp_dollars -= 5
 
-                        amount = random.randint(5, 10)
-                        if int(datum[2]) + amount < 50:
-                            output += ':' + message.author.name + ':' + str(int(datum[2]) + amount) + ':\n'
+                            amount = random.randint(5, 10)
+                            if int(datum[2]) + amount < 50:
+                                output += ':' + message.author.name + ':' + str(int(datum[2]) + amount) + ':\n'
 
-                            yield from client.send_message(message.channel, 'You fed your cow.')
+                                yield from client.send_message(message.channel, 'You spent 5 dollars to feed your cow.')
+                            else:
+                                yield from client.send_message(message.channel, 'Your cow exploded!!')
                         else:
                             yield from client.send_message(message.channel, 'You are too poor to feed your cow.')
 
