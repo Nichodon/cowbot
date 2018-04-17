@@ -308,15 +308,23 @@ class Class(discord.Client):
             yield from client.send_message(message.channel, '**Announcement**', embed=embed)
             yield from client.delete_message(message)
         elif message.content.startswith('//s '):
-            date = message.content.split('//s ')[1]
-            if date == 'today':
-                date = strftime("%m-%d-%y", gmtime())
+            try:
+                date = message.content.split('//s ')[1]
+                if date == 'today':
+                    date = strftime("%m-%d-%y", gmtime())
 
-            split = date.split('-')
-            split = [str(int(x)) for x in split]
+                split = date.split('-')
+                split = [str(int(x)) for x in split]
+            except ValueError:
+                yield from client.send_message(message.channel, 'Er, that\'s a bad date.')
+                return
 
             if last(strftime("%I", gmtime())) and message.content == '//s today':
                 split[1] = str(int(split[1]) - 1)
+
+            if len(split) < 3:
+                yield from client.send_message(message.channel, 'Er, that\'s a bad date.')
+                return
 
             periods = ''
             times = ''
@@ -351,7 +359,10 @@ class Class(discord.Client):
             embed.add_field(name='Times', value=times, inline=True)
             embed.set_thumbnail(
                 url="https://gunn.pausd.org/sites/default/files/oa_features/images/gunn%20athletics%20logo.gif")
-            yield from client.send_message(message.channel, '**The Schedule:**', embed=embed)
+            try:
+                yield from client.send_message(message.channel, '**The Schedule:**', embed=embed)
+            except discord.errors.HTTPException:
+                yield from client.send_message(message.channel, 'Er, that\'s a bad date.')
 
 
 client = Class()
