@@ -265,6 +265,7 @@ class Class(discord.Client):
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
+
         elif message.content.startswith('//covfefe '):
             target = message.content.split('//covfefe ')[1]
             with open('covfefe.txt') as covfefe:
@@ -278,6 +279,7 @@ class Class(discord.Client):
                                  icon_url='https://pbs.twimg.com/profile_images/' +
                                           '874276197357596672/kUuht00m_400x400.jpg')
                 yield from client.send_message(message.channel, 'Someone just got covfefed:', embed=tweet)
+
         elif message.content.startswith('//poll num '):
             yield from client.add_reaction(message, '\u0030\u20e3')
             yield from client.add_reaction(message, '\u0031\u20e3')
@@ -290,12 +292,11 @@ class Class(discord.Client):
             yield from client.add_reaction(message, '\u0038\u20e3')
             yield from client.add_reaction(message, '\u0039\u20e3')
             yield from client.add_reaction(message, '\U0001f51f')
+
         elif message.content.startswith('//poll '):
             yield from client.add_reaction(message, '\u2705')
             yield from client.add_reaction(message, '\u274e')
-        elif message.content.startswith('//last'):
-            with open('data.txt') as thing:
-                yield from client.send_message(message.channel, thing.read())
+
         elif message.content.startswith('//indent '):
             thing = message.content.split('//indent ')[1]
             color = '00cc99'
@@ -307,6 +308,7 @@ class Class(discord.Client):
 
             yield from client.send_message(message.channel, '**Announcement**', embed=embed)
             yield from client.delete_message(message)
+
         elif message.content.startswith('//s '):
             try:
                 date = message.content.split('//s ')[1]
