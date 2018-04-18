@@ -17,6 +17,11 @@ def get_dict():
         return json.load(g)
 
 
+def set_dict(new):
+    with open('datum.json', 'w') as g:
+        json.dump(new, g, indent=2)
+
+
 with open('schedules.txt', 'r') as f:
     schedule = f.readlines()
 
@@ -63,8 +68,7 @@ def bank_set(user, amount):
         bank[user]['money'] = amount
     else:
         bank[user]['money'] = out + amount
-    with open('datum.json', 'w') as g:
-        json.dump(bank, g, indent=2)
+    set_dict(bank)
 
 
 def cow_get(user):
@@ -79,8 +83,7 @@ def cow_set(user, pet):
     if cow.get(user) is None:
             cow[user] = {}
     cow[user]['cow'] = pet
-    with open('datum.json', 'w') as g:
-        json.dump(cow, g, indent=2)
+    set_dict(cow)
 
 
 ER_DESIRED = 0.005
@@ -157,7 +160,7 @@ class Class(discord.Client):
 
             embed = discord.Embed(title='convert',
                                   description='<@' + message.author.id + '> ' + str(amount))
-            yield from client.send_message(message.channel, bot.mention, embed=embed)
+            yield from client.send_message(client.get_channel(id='433441820102361110'), bot.mention, embed=embed)
 
             success = yield from client.wait_for_reaction(emoji="👌", user=bot, timeout=15)
             if not success:
