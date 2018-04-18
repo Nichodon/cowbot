@@ -63,9 +63,24 @@ def bank_set(user, amount):
         bank[user]['money'] = amount
     else:
         bank[user]['money'] = out + amount
-        pprint(bank)
     with open('datum.json', 'w') as g:
         json.dump(bank, g, indent=2)
+
+
+def cow_get(user):
+    out = get_dict().get(user, {}).get('cow')
+    if out is None:
+        return {}
+    return out
+
+
+def cow_set(user, pet):
+    cow = get_dict()
+    if cow.get(user) is None:
+            cow[user] = {}
+    cow[user]['cow'] = pet
+    with open('datum.json', 'w') as g:
+        json.dump(cow, g, indent=2)
 
 
 ER_DESIRED = 0.005
@@ -109,8 +124,6 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
-        if message.content == 'SECRET STUFF':
-            bank_set('Sean', 10)
         if message.content.startswith('//daily'):
             yield from client.send_message(message.channel, date.today())
 
@@ -124,7 +137,6 @@ class Class(discord.Client):
                 yield from client.send_message(message.channel, 'Er, that\'s a bad echo.')
                 return
             yield from client.send_message(message.channel, message.content[7:])
-            yield from client.send_message(message.channel, 'PSA: no more chaining bot echos because you are spamming me with error messages.')
 
         elif not message.author.bot and message.content.startswith('//convert '):
             data = message.content.split(' ')
