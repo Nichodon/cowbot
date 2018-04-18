@@ -4,9 +4,16 @@ from time import gmtime, strftime
 from discord.utils import *
 import random
 import re
+import json
+from pprint import pprint
 
 import logging
 logging.basicConfig(level=logging.INFO)
+
+
+def get_dict():
+    with open('datum.json', 'r') as g:
+        return json.load(g)
 
 
 with open('schedules.txt', 'r') as f:
@@ -40,39 +47,24 @@ def convert(x):
 
 
 def bank_get(user):
-    with open('money.txt') as bank:
-        money = bank.readlines()
-
-    found = False
-    for stuff in money:
-        datum = stuff.split(':')
-        if datum[1] == user:
-            print(datum[2])
-            return float(datum[2])
-    if not found:
-        print(0)
+    out = get_dict().get(user, {}).get('money')
+    if out is None:
         return 0
+    return out
 
 
 def bank_set(user, amount):
-    with open('money.txt') as bank:
-        money = bank.readlines()
-
-    found = False
-    again = ''
-    for stuff in money:
-        datum = stuff.split(':')
-        if datum[1] == user:
-            again += ':' + user + ':' + str(float(datum[2]) + amount) + ':\n'
-            found = True
-        else:
-            again += stuff
-    if not found:
-        again += ':' + user + ':' + str(amount) + ':\n'
-
-    put = open('money.txt', 'w')
-    put.write(again)
-    put.close()
+    bank = get_dict()
+    out = bank.get(user, {}).get('money')
+    if out is None:
+        if bank.get(user) is None:
+            bank[user] = {}
+        bank[user]['money'] = amount
+    else:
+        bank[user]['money'] = out + amount
+        pprint(bank)
+    with open('datum.json', 'w') as g:
+        json.dump(bank, g, indent=2)
 
 
 ER_DESIRED = 0.005
