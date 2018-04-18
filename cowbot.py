@@ -92,26 +92,26 @@ ER_DESIRED = 0.005
 ER_MAX = 0.5
 # Highest 1cb = Xu
 
-TOTAL_NORMAL = 20000000
-# Normal bot total
-
 TOTAL_MONEY = 0
-TOTAL_UN = TOTAL_NORMAL / ER_DESIRED
+TOTAL_UN = 100000
 GOV_MONEY = TOTAL_UN / ER_MAX
 ER_UN = 0
+
+
+def cowbits():
+    bank = get_dict()
+    total = 0
+    people = bank.keys()
+    for person in people:
+        total += bank[person]['money']
+    return total
 
 
 def universal():
     global TOTAL_MONEY
     global ER_UN
 
-    total = 0
-    with open('money.txt') as bank:
-        money = bank.readlines()
-
-    for stuff in money:
-        datum = stuff.split(':')
-        total += float(datum[2])
+    total = cowbits()
 
     TOTAL_MONEY = total / 100
     ER_UN = 1 / (GOV_MONEY + TOTAL_MONEY) * TOTAL_UN
@@ -128,7 +128,19 @@ class Class(discord.Client):
     @asyncio.coroutine
     def on_message(self, message):
         if message.content.startswith('//daily'):
-            yield from client.send_message(message.channel, date.today())
+            thing = get_dict()
+            daily = thing.get(message.author.name, {}).get('daily')
+            if daily is None or daily != str(date.today()):
+                bank_set(message.author.name, 100)
+                thing[message.author.name]['daily'] = str(date.today())
+                set_dict(thing)
+                yield from client.send_message(message.channel, 'Here\'s your daily 100cb!')
+            else:
+                yield from client.send_message(message.channel, 'You have to wait another day!')
+
+        elif message.content.startswith('//econ'):
+            universal()
+            yield from client.send_message(message.channel, 'Total cb: ' + str(cowbits()) + '\nExchange: ' + str(ER_UN))
 
         elif message.content.startswith('//bank ') and len(message.mentions) > 0:
             yield from client.send_message(message.channel,
