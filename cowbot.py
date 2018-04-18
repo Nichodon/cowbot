@@ -108,16 +108,22 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
-        if message.content.startswith('//bank ') and len(message.mentions) > 0:
-            yield from client.send_message(message.channel,
-                                           message.mentions[0].name + ' has ' + str(bank_get(message.mentions[0].name))
-                                           + 'cb')
+        if message.content == 'SECRET STUFF':
+            bank_set('Sean', 10)
+        if message.content.startswith('//daily'):
+            yield from client.send_message(message.channel, date.today())
 
-        elif message.content.startswith('//echo '):
-            if message.content.split('//echo ')[1] == '':
+        elif message.content.startswith('//bank ') and len(message.mentions) > 0:
+            yield from client.send_message(message.channel,
+                                           message.mentions[0].name + ' has ' +
+                                           str(int(bank_get(message.mentions[0].name))) + 'cb')
+
+        elif message.content.startswith('//echo ') and not message.author.bot:
+            if message.content[7:] == '':
                 yield from client.send_message(message.channel, 'Er, that\'s a bad echo.')
                 return
-            yield from client.send_message(message.channel, message.content.split('//echo ')[1])
+            yield from client.send_message(message.channel, message.content[7:])
+            yield from client.send_message(message.channel, 'PSA: no more chaining bot echos because you are spamming me with error messages.')
 
         elif not message.author.bot and message.content.startswith('//convert '):
             data = message.content.split(' ')
@@ -295,19 +301,28 @@ class Class(discord.Client):
             if thing.startswith('c='):
                 color = thing.split(' ')[0][2:]
                 thing = thing[9:]
-            embed = discord.Embed(colour=discord.Colour(int(color, 16)))
+            try:
+                embed = discord.Embed(colour=discord.Colour(int(color, 16)))
+            except ValueError:
+                yield from client.send_message(message.channel, 'Er, that\'s a bad color.')
+                return
             embed.add_field(name=message.author.name + ' says:', value=thing, inline=True)
 
-            yield from client.send_message(message.channel, '**Announcement**', embed=embed)
-            yield from client.delete_message(message)
+            try:
+                yield from client.send_message(message.channel, '**Announcement**', embed=embed)
+                yield from client.delete_message(message)
+            except discord.errors.Forbidden:
+                yield from client.send_message(message.channel, 'Er, I don\'t have all the perms to do that.')
+            except discord.errors.HTTPException:
+                yield from client.send_message(message.channel, 'Er, that\'s a bad color.')
 
         elif message.content.startswith('//s '):
             try:
-                date = message.content.split('//s ')[1]
-                if date == 'today':
-                    date = strftime("%m-%d-%y", gmtime())
+                day = message.content.split('//s ')[1]
+                if day == 'today':
+                    day = strftime("%m-%d-%y", gmtime())
 
-                split = date.split('-')
+                split = day.split('-')
                 split = [str(int(x)) for x in split]
             except ValueError:
                 yield from client.send_message(message.channel, 'Er, that\'s a bad date.')
