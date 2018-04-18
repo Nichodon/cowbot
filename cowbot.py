@@ -186,72 +186,38 @@ class Class(discord.Client):
         if message.content.startswith('//cow'):
             command = message.content.split(' ')[1]
             print(command)
-            with open('data.txt') as thing:
-                contents = thing.readlines()
 
-            found = False
-            output = ''
+            difference = 0
+            money = bank_get(message.author.name)
+            cow = cow_get(message.author.name)
 
-            temp_dollars = bank_get(message.author.name)
-
-            for line in contents:
-                datum = line.split(':')
-                if datum[1] == message.author.name:
-                    if command == 'buy':
-                        output += line
-
-                        yield from client.send_message(message.channel, 'You already have a cow!')
-                        found = True
-                    elif command == 'feed' and temp_dollars > 4:
-                        if temp_dollars < 4:
-                            temp_dollars -= 5
-
-                            amount = random.randint(5, 10)
-                            if int(datum[2]) + amount < 50:
-                                output += ':' + message.author.name + ':' + str(int(datum[2]) + amount) + ':\n'
-
-                                yield from client.send_message(message.channel, 'You spent 5 dollars to feed your cow.')
-                            else:
-                                yield from client.send_message(message.channel, 'Your cow exploded!!')
-                        else:
-                            yield from client.send_message(message.channel, 'You are too poor to feed your cow.')
-
-                    elif command == 'size':
-                        output += line
-
-                        if int(datum[2]) > 40:
-                            yield from client.send_message(message.channel, 'Your cow is extreme obese!!')
-                        elif int(datum[2]) > 30:
-                            yield from client.send_message(message.channel, 'Your cow is pretty fat!')
-                        elif int(datum[2]) > 20:
-                            yield from client.send_message(message.channel, 'Your cow is looking a bit big.')
-                        elif int(datum[2]) > 10:
-                            yield from client.send_message(message.channel, 'Your cow is a tad small.')
-                        else:
-                            yield from client.send_message(message.channel, 'Your cow is starving!')
-                    elif command == 'sell':
-                        temp_dollars += 490 + int(datum[2])
-
-                        yield from client.send_message(message.channel, 'You sold your cow for ' +
-                                                       str(490 + int(datum[2])) + 'cb. :(')
-                else:
-                    output += line
-
-            if not found:
+            if not cow:
                 if command == 'buy':
-                    if temp_dollars > 499:
-                        temp_dollars -= 500
-                        output += ':' + message.author.name + ':10:\n'
-
-                        yield from client.send_message(message.channel, 'You bought a cow for 500cb. :)')
+                    if money >= 500:
+                        cow_set(message.author.name, {'size': 10})
+                        difference = -500
+                        yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
                     else:
-                        yield from client.send_message(message.channel, 'You are too poor to buy a cow.')
+                        yield from client.send_message(message.channel, 'You are too poor to buy a cow!')
+                else:
+                    yield from client.send_message(message.channel, 'You don\'t have a cow!')
+            else:
+                if command == 'size':
+                    yield from client.send_message(message.channel, 'Your cow is of size ' + str(cow['size']) + '.')
+                elif command == 'feed':
+                    if money >= 5:
+                        difference = -5
+                        yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
+                    else:
+                        yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
+                elif command == 'sell':
+                    difference = 500
+                    cow_set(message.author.name, {})
+                    yield from client.send_message(message.channel, 'You sold your cow for 500cb.')
+                else:
+                    yield from client.send_message(message.channel, 'Wait what?')
 
-            out = open('data.txt', 'w')
-            out.write(output)
-            out.close()
-
-            bank_set(message.author.name, temp_dollars - bank_get(message.author.name))
+            bank_set(message.author.name, difference)
 
         elif message.content.startswith('//help'):
             embed = discord.Embed(description='**Schedule**: `//s <date>`\n' +
