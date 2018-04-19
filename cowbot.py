@@ -132,6 +132,7 @@ class Class(discord.Client):
             daily = thing.get(message.author.name, {}).get('daily')
             if daily is None or daily != str(date.today()):
                 bank_set(message.author.name, 100)
+                thing = get_dict()
                 thing[message.author.name]['daily'] = str(date.today())
                 set_dict(thing)
                 yield from client.send_message(message.channel, 'Here\'s your daily 100cb!')
@@ -140,7 +141,10 @@ class Class(discord.Client):
 
         elif message.content.startswith('//econ'):
             universal()
-            yield from client.send_message(message.channel, 'Total cb: ' + str(cowbits()) + '\nExchange: ' + str(ER_UN))
+            embed = discord.Embed(description='Total cb: ' + str(round(cowbits())) + '\nExchange: 1cb = ' +
+                                              str(round(ER_UN * 10000) / 10000) + 'u',
+                                  colour=discord.Colour(0x00cc99))
+            yield from client.send_message(message.channel, 'The Cowbank Economy:', embed=embed)
 
         elif message.content.startswith('//bank ') and len(message.mentions) > 0:
             yield from client.send_message(message.channel,
@@ -222,7 +226,14 @@ class Class(discord.Client):
                 elif command == 'feed':
                     if money >= 5:
                         difference = -5
-                        yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
+                        feed = random.randint(5, 10)
+                        if cow['size'] + feed > 50:
+                            cow_set(message.author.name, {})
+                            yield from client.send_message(message.channel, 'Your cow exploded!')
+                        else:
+                            cow['size'] += feed
+                            cow_set(message.author.name, cow)
+                            yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
                 elif command == 'sell':
