@@ -1,0 +1,27 @@
+**Cowbot Banking**
+Cowbot has a banking system that communicates with moofy and discow!
+Things are a bit experimental here, and new features are on the way.
+
+**Terminology**
+`cowbank`: Cowbot's bank, where all money of cowbot is at
+`cowbit`, `cb`: The currency of the cowbank
+
+**Commands**
+`//convert <currency> <amount>`:
+        Takes cb out of your bank and puts it in your bank of another bot
+        `currency`: Either "`bcbw`" or "`mn`"
+        `amount`: The amount of cb to convert, a number
+
+`//daily`: Gives you your daily cb, can only be done daily (duh)
+
+`//econ`: Grabs information on the cowbank
+
+**Cow Pets**
+This is the main way you can spend or get money!
+`//cow <sub>`
+
+Subcommands:
+`buy`: Gets a cow for 500cb, you can only have one cow
+`sell`: Sells your cow based on its health
+`feed`: Spends 5cb to feed, but don't feed too much!
+`size`: Gets the size of your cow

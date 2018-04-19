@@ -271,13 +271,8 @@ class Class(discord.Client):
                                            ' channel that allows bots.', embed=embed)
 
         elif message.content.startswith('//bh'):
-            embed = discord.Embed(description='**Cowbot Banking**\n' +
-                                              'Cowbot has a very experimental banking system that communicates with ' +
-                                              'moofy and discow! The currency is the cowbit (cb). To see someone\'s ' +
-                                              'bank, do `//bank <mention>`. To take money out of the cowbot bank ' +
-                                              '(the cowbank), do `//convert <currency> <amount>`. Supported ' +
-                                              'currencies are `bcbw` for bitcoin but worse, and `mn` for mooney.',
-                                  colour=discord.Colour(0x00cc99))
+            with open('bh.txt', 'r') as g:
+                embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
