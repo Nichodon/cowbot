@@ -1,0 +1,28 @@
+**Cowbot Help**
+Hi! Cowbot is a bot about cows (I mean, what more can I say?).
+Cowbot is made by Nichodon, so yeah.
+
+**Commands**
+`//s <date>`:
+        Displays Gunn Alternate Schedules
+        `date`: Either a date in the format `m-d-y` or "`today`"
+
+`//indent [c=<color>] <text>`:
+        Echoes text in an embed
+        `color`: Optional, is a six-digit hex color
+        `text`: The text to echo in the embed
+
+`//echo <text>`:
+        Echoes text in a message
+        `text`: The text to echo in the message
+
+`//poll [num]`:
+        Displays a yes or no poll through reactions
+        `num`: If the text "`num`" is present, will display numbers
+
+`//covfefe <person>`:
+        Makes Trump tweet things about someone
+        `person`: Whoever Trump does not like
+
+**Banking**
+Do `//bh` for help on the cowbank

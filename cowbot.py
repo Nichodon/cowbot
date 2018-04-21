@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from time import gmtime, strftime
 from datetime import date
 from discord.utils import *
@@ -213,7 +212,7 @@ class Class(discord.Client):
             if not cow:
                 if command == 'buy':
                     if money >= 500:
-                        cow_set(message.author.name, {'size': 10})
+                        cow_set(message.author.name, {'size': 10, 'att': 0, 'def': 0})
                         difference = -500
                         yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
                     else:
@@ -246,26 +245,8 @@ class Class(discord.Client):
             bank_set(message.author.name, difference)
 
         elif message.content.startswith('//help'):
-            embed = discord.Embed(description='**Schedule**: `//s <date>`\n' +
-                                              '\t\tShows Gunn Alternate Schedules\n' +
-                                              '\t\t`date`: A date in the format `m-d-y` or "`today`". ' +
-                                              '`y` is two digit.\n' +
-                                              '\t\tExample: `//s 3-28-18`\n\n' +
-                                              '**Indent**: `//indent [c=color] <text>`\n' +
-                                              '\t\tPuts text in a pretty box\n' +
-                                              '\t\t`color`: A 6-digit RGB Hex.\n' +
-                                              '\t\tExample: `//indent c=00cc99 I am some indented text!`\n\n' +
-                                              '**Poll**: `//poll ["num"] [text]`\n' +
-                                              '\t\tGenerates a poll through reactions\n' +
-                                              '\t\t`"num"`: If present, will generate one to ten. ' +
-                                              'If absent, will generate yes / no.\n' +
-                                              '\t\tExample: `//poll num How many cows should we buy?`\n\n' +
-                                              '**Trump Tweet**: `//covfefe [person]`\n' +
-                                              '\t\tMakes Trump tweet about someone\n' +
-                                              '\t\t`person`: A victim of a Trump attack\n' +
-                                              '\t\tExample: `//covfefe CNN`\n\n' +
-                                              '**BANK**: do `//bh` for more info!',
-                                  colour=discord.Colour(0x00cc99))
+            with open('h.txt', 'r') as g:
+                embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
