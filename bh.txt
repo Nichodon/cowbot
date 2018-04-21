@@ -7,6 +7,10 @@ Things are a bit experimental here, and new features are on the way.
 `cowbit`, `cb`: The currency of the cowbank
 
 **Commands**
+`//bank <mention>`:
+        Displays the cowbits owned by someone
+        `mention`: A mention of a member on the server
+
 `//convert <currency> <amount>`:
         Takes cb out of your bank and puts it in your bank of another bot
         `currency`: Either "`bcbw`" or "`mn`"
