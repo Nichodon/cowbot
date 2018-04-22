@@ -85,6 +85,18 @@ def cow_set(user, pet):
     set_dict(cow)
 
 
+def init(user):
+    mode = get_dict()
+    if mode.get(user) is None:
+        mode[user] = {
+            'cow': {},
+            'daily': '',
+            'fight': False,
+            'money': 0
+        }
+        set_dict(mode)
+
+
 ER_DESIRED = 0.005
 # Desired 1cb = Xu
 
@@ -126,14 +138,23 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
-        if message.content.startswith('//daily'):
-            thing = get_dict()
-            daily = thing.get(message.author.name, {}).get('daily')
-            if daily is None or daily != str(date.today()):
-                bank_set(message.author.name, 100)
-                thing = get_dict()
-                thing[message.author.name]['daily'] = str(date.today())
-                set_dict(thing)
+        p = message.author.name
+        init(p)
+        d = get_dict()
+
+        if d[p]['fight'] and message.content.startswith('//'):
+            yield from client.send_message(message.channel, 'You are in a fight right now!')
+            return
+
+        if message.content.startswith('//fight'):
+            d[p]['fight'] = True
+            set_dict(d)
+
+        elif message.content.startswith('//daily'):
+            if d[p]['daily'] != str(date.today()):
+                d[p]['money'] += 100
+                d[p]['daily'] = str(date.today())
+                set_dict(d)
                 yield from client.send_message(message.channel, 'Here\'s your daily 100cb!')
             else:
                 yield from client.send_message(message.channel, 'You have to wait another day!')
