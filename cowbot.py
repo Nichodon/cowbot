@@ -51,21 +51,6 @@ def convert(x):
     return out
 
 
-def cow_get(user):
-    out = get_dict().get(user, {}).get('cow')
-    if out is None:
-        return {}
-    return out
-
-
-def cow_set(user, pet):
-    cow = get_dict()
-    if cow.get(user) is None:
-            cow[user] = {}
-    cow[user]['cow'] = pet
-    set_dict(cow)
-
-
 def init(user):
     mode = get_dict()
     if mode.get(user) is None:
@@ -209,12 +194,11 @@ class Class(discord.Client):
             print(command)
 
             difference = 0
-            cow = d[p]['cow']
 
-            if cow == {}:
+            if d[p]['cow'] == {}:
                 if command == 'buy':
                     if d[p]['money'] >= 500:
-                        cow_set(p, {'size': 10, 'att': 0, 'def': 0})
+                        d[p]['cow'] = {'att': 0, 'def': 0, 'size': 10}
                         difference = -500
                         yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
                     else:
@@ -225,28 +209,29 @@ class Class(discord.Client):
                 if command == 'buy':
                     yield from client.send_message(message.channel, 'You already have a cow!')
                 elif command == 'size':
-                    yield from client.send_message(message.channel, 'Your cow is of size ' + str(cow['size']) + '.')
+                    yield from client.send_message(message.channel, 'Your cow is of the size ' +
+                                                   str(d[p]['cow']['size']) + '.')
                 elif command == 'feed':
                     if d[p]['money'] >= 5:
                         difference = -5
                         feed = random.randint(5, 10)
-                        if cow['size'] + feed > 50:
-                            cow_set(p, {})
+                        if d[p]['cow']['size'] + feed > 50:
+                            d[p]['cow'] = {}
                             yield from client.send_message(message.channel, 'Your cow exploded!')
                         else:
-                            cow['size'] += feed
-                            cow_set(p, cow)
+                            d[p]['size'] += feed
                             yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
                 elif command == 'sell':
                     difference = 500
-                    cow_set(p, {})
+                    d[p]['cow'] = {}
                     yield from client.send_message(message.channel, 'You sold your cow for 500cb.')
                 else:
                     yield from client.send_message(message.channel, 'Wait what?')
 
             d[p]['money'] += difference
+            set_dict(d)
 
         elif message.content.startswith('//help'):
             with open('h.txt', 'r') as g:
