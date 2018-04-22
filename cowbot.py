@@ -105,6 +105,7 @@ ER_MAX = 0.5
 
 TOTAL_MONEY = 0
 TOTAL_UN = 100000
+NORM_MONEY = 100000
 GOV_MONEY = TOTAL_UN / ER_MAX
 ER_UN = 0
 
@@ -125,7 +126,7 @@ def universal():
     total = cowbits()
 
     TOTAL_MONEY = total / 100
-    ER_UN = 1 / (GOV_MONEY + TOTAL_MONEY) * TOTAL_UN
+    ER_UN = 1 / (GOV_MONEY + (TOTAL_MONEY * TOTAL_UN) / (ER_DESIRED * NORM_MONEY)) * TOTAL_UN
 
 
 class Class(discord.Client):
