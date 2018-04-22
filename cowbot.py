@@ -18,7 +18,7 @@ def get_dict():
 
 def set_dict(new):
     with open('datum.json', 'w') as g:
-        json.dump(new, g, indent=2)
+        json.dump(new, g, indent=2, sort_keys=True)
 
 
 with open('schedules.txt', 'r') as f:
@@ -101,15 +101,16 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_ready(self):
-        yield from client.change_presence(game=discord.Game(name='//help | In development! Things might break!'))
+        yield from client.change_presence(game=discord.Game(name='//help - IN DEVELOPMENT!', type=2))
 
     @asyncio.coroutine
     def on_message(self, message):
         p = message.author.name
-        init(p)
+        if message.content.startswith('//'):
+            init(p)
         d = get_dict()
 
-        if d[p]['fight'] and message.content.startswith('//'):
+        if message.content.startswith('//') and d[p]['fight']:
             yield from client.send_message(message.channel, 'You are in a fight right now!')
             return
 
@@ -198,7 +199,13 @@ class Class(discord.Client):
             if d[p]['cow'] == {}:
                 if command == 'buy':
                     if d[p]['money'] >= 500:
-                        d[p]['cow'] = {'att': 0, 'def': 0, 'size': 10}
+                        d[p]['cow'] = {
+                            'attack': 0,
+                            'charge': 0,
+                            'defense': 0,
+                            'health': 0,
+                            'size': 10
+                        }
                         difference = -500
                         yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
                     else:
