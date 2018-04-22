@@ -21,6 +21,12 @@ def set_dict(new):
         json.dump(new, g, indent=2, sort_keys=True)
 
 
+def backup():
+    new = get_dict()
+    with open('backup.json', 'w') as g:
+        json.dump(new, g, indent=2, sort_keys=True)
+
+
 with open('schedules.txt', 'r') as f:
     schedule = f.readlines()
 
@@ -105,6 +111,14 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_message(self, message):
+        if message.content.startswith('//backup'):
+            if message.author.id == '418921871333916683':
+                backup()
+                yield from client.send_message(message.channel, 'Data saved to backup.')
+            else:
+                yield from client.send_message(message.channel, 'You aren\'t Nichodon...')
+            return
+
         p = message.author.name
         if message.content.startswith('//'):
             init(p)
