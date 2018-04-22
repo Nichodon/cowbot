@@ -51,25 +51,6 @@ def convert(x):
     return out
 
 
-def bank_get(user):
-    out = get_dict().get(user, {}).get('money')
-    if out is None:
-        return 0
-    return out
-
-
-def bank_set(user, amount):
-    bank = get_dict()
-    out = bank.get(user, {}).get('money')
-    if out is None:
-        if bank.get(user) is None:
-            bank[user] = {}
-        bank[user]['money'] = amount
-    else:
-        bank[user]['money'] = out + amount
-    set_dict(bank)
-
-
 def cow_get(user):
     out = get_dict().get(user, {}).get('cow')
     if out is None:
@@ -170,9 +151,9 @@ class Class(discord.Client):
         elif message.content.startswith('//bank ') and len(message.mentions) > 0:
             yield from client.send_message(message.channel,
                                            message.mentions[0].name + ' has ' +
-                                           str(int(bank_get(message.mentions[0].name))) + 'cb')
+                                           str(int(d[message.mentions[0].name]['money'])) + 'cb')
 
-        elif message.content.startswith('//echo ') and not message.author.bot:
+        elif message.content.startswith('//echo ') and not p == 'cowbot':
             if message.content[7:] == '':
                 yield from client.send_message(message.channel, 'Er, that\'s a bad echo.')
                 return
@@ -182,7 +163,7 @@ class Class(discord.Client):
             data = message.content.split(' ')
             amount = float(data[2])
 
-            if bank_get(message.author.name) < amount:
+            if d[p]['money'] < amount:
                 yield from client.send_message(message.channel, 'You are too poor to make that conversion.')
                 return
 
@@ -205,13 +186,13 @@ class Class(discord.Client):
                                                bot.mention + ' did not respond, so no conversion was made.')
             else:
                 yield from client.send_message(message.channel, 'A conversion was made!')
-                bank_set(message.author.name, -float(data[2]))
+                d[p]['money'] -= float(data[2])
 
         if len(message.mentions) > 0:
-            if message.author.name != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
+            if p != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
                 yield from client.send_message(message.channel, 'Hi! Do `//help` for a list of commands.')
 
-            elif message.author.name != 'cowbot' and message.mentions[0].name == 'cowbot':
+            elif p != 'cowbot' and message.mentions[0].name == 'cowbot':
                 if message.embeds[0]["title"] == 'convert':
                     regex = re.compile(r'<@!?(\d+)>')
                     user = yield from client.get_user_info(regex.search(message.embeds[0]["description"]).group(1))
@@ -219,7 +200,7 @@ class Class(discord.Client):
                     universal()
                     amount /= ER_UN
 
-                    bank_set(user.name, amount)
+                    d[user.name]['money'] += amount
 
                     yield from client.add_reaction(message, '\U0001F44C')
 
@@ -228,13 +209,12 @@ class Class(discord.Client):
             print(command)
 
             difference = 0
-            money = bank_get(message.author.name)
-            cow = cow_get(message.author.name)
+            cow = d[p]['cow']
 
-            if not cow:
+            if cow == {}:
                 if command == 'buy':
-                    if money >= 500:
-                        cow_set(message.author.name, {'size': 10, 'att': 0, 'def': 0})
+                    if d[p]['money'] >= 500:
+                        cow_set(p, {'size': 10, 'att': 0, 'def': 0})
                         difference = -500
                         yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
                     else:
@@ -242,29 +222,31 @@ class Class(discord.Client):
                 else:
                     yield from client.send_message(message.channel, 'You don\'t have a cow!')
             else:
-                if command == 'size':
+                if command == 'buy':
+                    yield from client.send_message(message.channel, 'You already have a cow!')
+                elif command == 'size':
                     yield from client.send_message(message.channel, 'Your cow is of size ' + str(cow['size']) + '.')
                 elif command == 'feed':
-                    if money >= 5:
+                    if d[p]['money'] >= 5:
                         difference = -5
                         feed = random.randint(5, 10)
                         if cow['size'] + feed > 50:
-                            cow_set(message.author.name, {})
+                            cow_set(p, {})
                             yield from client.send_message(message.channel, 'Your cow exploded!')
                         else:
                             cow['size'] += feed
-                            cow_set(message.author.name, cow)
+                            cow_set(p, cow)
                             yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
                 elif command == 'sell':
                     difference = 500
-                    cow_set(message.author.name, {})
+                    cow_set(p, {})
                     yield from client.send_message(message.channel, 'You sold your cow for 500cb.')
                 else:
                     yield from client.send_message(message.channel, 'Wait what?')
 
-            bank_set(message.author.name, difference)
+            d[p]['money'] += difference
 
         elif message.content.startswith('//help'):
             with open('h.txt', 'r') as g:
@@ -322,7 +304,7 @@ class Class(discord.Client):
             except ValueError:
                 yield from client.send_message(message.channel, 'Er, that\'s a bad color.')
                 return
-            embed.add_field(name=message.author.name + ' says:', value=thing, inline=True)
+            embed.add_field(name=p + ' says:', value=thing, inline=True)
 
             try:
                 yield from client.send_message(message.channel, '**Announcement**', embed=embed)
