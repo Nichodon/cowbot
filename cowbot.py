@@ -6,6 +6,7 @@ import random
 import re
 import json
 from pprint import pprint
+import math
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -122,6 +123,8 @@ class Class(discord.Client):
 
         p = message.author.name
         if message.content.startswith('//'):
+            #yield from client.send_message(client.get_channel(id='438372178522669062'), '`' + message.author.name +
+                                           #' said ' + message.content + '`')
             init(p)
         d = get_dict()
 
@@ -172,7 +175,7 @@ class Class(discord.Client):
                 return
             yield from client.send_message(message.channel, message.content[7:])
 
-        elif not message.author.bot and message.content.startswith('//convert '):
+        elif message.content.startswith('//convert '):
             data = message.content.split(' ')
             amount = float(data[2])
 
@@ -232,7 +235,7 @@ class Class(discord.Client):
                             'attack': 0,
                             'charge': 0,
                             'defense': 0,
-                            'health': 0,
+                            'health': 20,
                             'size': 10
                         }
                         difference = -500
