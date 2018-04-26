@@ -146,17 +146,17 @@ class Class(discord.Client):
 
         elif message.content.startswith('//daily'):
             if d[p]['daily'] != str(date.today()):
-                d[p]['money'] += 100
+                d[p]['money'] += 100000
                 d[p]['daily'] = str(date.today())
                 set_dict(d)
-                yield from client.send_message(message.channel, 'Here\'s your daily 100cb!')
+                yield from client.send_message(message.channel, 'Here\'s your daily 100kcb!')
             else:
                 yield from client.send_message(message.channel, 'You have to wait another day!')
 
         elif message.content.startswith('//econ'):
             universal()
-            embed = discord.Embed(description='Total cb: ' + str(round(cowbits())) + '\nExchange: 1cb = ' +
-                                              str(round(ER_UN * 10000) / 10000) + 'u',
+            embed = discord.Embed(description='Total kcb: ' + str(round(cowbits()) / 1000) + '\nExchange: 1kcb = ' +
+                                              str(round(ER_UN * 10000000) / 10000) + 'u',
                                   colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'The Cowbank Economy:', embed=embed)
 
@@ -199,6 +199,7 @@ class Class(discord.Client):
             else:
                 yield from client.send_message(message.channel, 'A conversion was made!')
                 d[p]['money'] -= float(data[2])
+                set_dict(d)
 
         if len(message.mentions) > 0:
             if p != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
