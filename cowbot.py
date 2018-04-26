@@ -124,6 +124,18 @@ class Class(discord.Client):
             init(p)
         d = get_dict()
 
+        if message.content.startswith('//leader'):
+            this = sorted([(x, d[x]['money']) for x in d], key=lambda x: x[1], reverse=True)
+            out = ''
+            maximum = this[0][1]
+            other = max([len(x) for x in d])
+            for x in this:
+                bars = int(math.ceil(x[1] * 40 / maximum))
+                out += '`\u200b' + ' ' * (other - len(x[0])) + x[0] + ' ' + ('\u00b7' if bars == 0 else '') + \
+                       '\u2015' * bars + ' ' + str(int(x[1]) / 1000) + '`\n'
+            embed = discord.Embed(title='cowbank Leaderboard in kcb', description=out)
+            yield from client.send_message(message.channel, '', embed=embed)
+
         if message.content.startswith('//') and d[p]['fight']:
             yield from client.send_message(message.channel, 'You are in a fight right now!')
             return
