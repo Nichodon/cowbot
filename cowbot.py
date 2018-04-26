@@ -69,16 +69,16 @@ def init(user):
         set_dict(mode)
 
 
-ER_DESIRED = 0.005
+ER_DESIRED = 0.0001
 # Desired 1cb = Xu
 
-ER_MAX = 0.5
+ER_MAX = 0.01
 # Highest 1cb = Xu
 
+NORM_MONEY = 10000000
+# Where desired is reached
+
 TOTAL_MONEY = 0
-TOTAL_UN = 100000
-NORM_MONEY = 100000
-GOV_MONEY = TOTAL_UN / ER_MAX
 ER_UN = 0
 
 
@@ -95,10 +95,11 @@ def universal():
     global TOTAL_MONEY
     global ER_UN
 
-    total = cowbits()
+    TOTAL_MONEY = cowbits()
+    ER_UN = 1 / ((1 / ER_MAX) + TOTAL_MONEY / (ER_DESIRED * NORM_MONEY))
 
-    TOTAL_MONEY = total / 100
-    ER_UN = 1 / (GOV_MONEY + (TOTAL_MONEY * TOTAL_UN) / (ER_DESIRED * NORM_MONEY)) * TOTAL_UN
+
+
 
 
 class Class(discord.Client):
@@ -214,6 +215,7 @@ class Class(discord.Client):
                     amount /= ER_UN
 
                     d[user.name]['money'] += amount
+                    set_dict(d)
 
                     yield from client.add_reaction(message, '\U0001F44C')
 
