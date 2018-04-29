@@ -109,7 +109,7 @@ class Class(discord.Client):
 
     @asyncio.coroutine
     def on_ready(self):
-        yield from client.change_presence(game=discord.Game(name='//help - IN DEVELOPMENT!', type=2))
+        yield from client.change_presence(game=discord.Game(name='//h - IN DEVELOPMENT!', type=2))
 
     @asyncio.coroutine
     def on_message(self, message):
@@ -207,7 +207,7 @@ class Class(discord.Client):
 
         if len(message.mentions) > 0:
             if p != 'cowbot' and len(message.embeds) == 0 and message.mentions[0].name == 'cowbot':
-                yield from client.send_message(message.channel, 'Hi! Do `//help` for a list of commands.')
+                yield from client.send_message(message.channel, 'Hi! Do `//h` for a list of commands.')
 
             elif p != 'cowbot' and message.mentions[0].name == 'cowbot':
                 if message.embeds[0]["title"] == 'convert':
@@ -272,7 +272,7 @@ class Class(discord.Client):
             d[p]['money'] += difference
             set_dict(d)
 
-        elif message.content.startswith('//help'):
+        elif message.content.startswith('//h'):
             with open('h.txt', 'r') as g:
                 embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
