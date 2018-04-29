@@ -12,6 +12,8 @@ Cowbot is made by Nichodon, so yeah.
         `color`: Optional, is a six-digit hex color
         `text`: The text to echo in the embed
 
+`//big <text>`: Shows message in big letters
+
 `//echo <text>`:
         Echoes text in a message
         `text`: The text to echo in the message

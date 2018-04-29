@@ -129,6 +129,22 @@ class Class(discord.Client):
         d = get_dict()
 
         if message.content.startswith('//leader'):
+        if message.content.startswith('//big '):
+            thing = message.content.split('//big ')[1]
+            chars = ''
+            for a in thing:
+                num = ord(a)
+                if 97 <= num <= 122:
+                    num -= 32
+                if 65 <= num <= 90:
+                    chars += chr(num - 65 + 127462) + ' '
+                if 48 <= num <= 57:
+                    chars += a + '\u20e3 '
+                if a == ' ':
+                    chars += '   '
+
+            yield from client.send_message(message.channel, '**' + message.author.name + '**: ' + chars)
+            yield from client.delete_message(message)
             this = sorted([(x, d[x]['money']) for x in d], key=lambda x: x[1], reverse=True)
             out = ''
             maximum = this[0][1]
