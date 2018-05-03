@@ -100,6 +100,103 @@ def universal():
     ER_UN = 1 / ((1 / ER_MAX) + TOTAL_MONEY / (ER_DESIRED * NORM_MONEY))
 
 
+class Game:
+    def __init__(self, cow1, cow2, player, channel):
+        self.cow1 = cow1
+        self.cow2 = cow2
+        self.player = player
+        self.channel = channel
+        self.embed = discord.Embed(title='Cowbot Fight', description='THIS IS A TEST!')
+        self.done = False
+        self.s1 = 0
+        self.s2 = 0
+        self.previous = None
+        self.mh = max(cow1['health'], cow2['health'])
+        pprint(cow1)
+
+    def update(self, message):
+        self.embed.clear_fields()
+        c1 = min(int(self.cow1['charge'] * 5), 50)
+        c2 = min(int(self.cow2['charge'] * 5), 50)
+        h1 = int(80 * self.cow1['health'] / self.mh) * '|' + '\n[' + c1 * '!' + (50 - c1) * '.' + ']\n'
+        h2 = int(80 * self.cow2['health'] / self.mh) * '|' + '\n[' + c2 * '!' + (50 - c2) * '.' + ']\n'
+        self.embed.add_field(name='Your Cow',
+                             value=h1 + '`\tAttack: ' + str(self.cow1['attack']) + '\tDefense: ' +
+                                   str(self.cow1['defense']) + '\t\t\t\t\t`', inline=False)
+        self.embed.add_field(name='Enemy\'s Cow', value=h2 + '`\tAttack: ' + str(self.cow2['attack']) + '\tDefense: ' +
+                                                        str(self.cow2['defense']) + '\t\t\t\t\t`')
+        self.embed.set_footer(text=message)
+
+    def enemy(self):
+        return 'hit'
+
+    def end(self, status1, status2):
+        self.s1 = status1
+        self.s2 = status2
+        self.done = True
+
+    @staticmethod
+    def r():
+        return random.uniform(0.75, 1.25)
+
+    def turn(self, command):
+        if command not in ['hit', 'shield', 'nuke', 'run']:
+            return
+        if command == 'nuke' and self.cow1['charge'] < 10:
+            return
+        enemy = self.enemy()
+        message = ''
+        if command == 'run' or enemy == 'run':
+            self.end(1 if command == 'run' else 0, 1 if enemy == 'run' else 0)
+            return
+        if command == 'hit':
+            if enemy == 'hit':
+                self.cow1['health'] -= self.r() * 4 * self.cow2['attack'] / self.cow1['defense']
+                self.cow2['health'] -= self.r() * 4 * self.cow1['attack'] / self.cow2['defense']
+                self.cow1['charge'] += self.r() * self.cow1['defense'] / self.cow2['attack']
+                self.cow2['charge'] += self.r() * self.cow2['defense'] / self.cow1['attack']
+                message = 'You both hit each other!'
+            elif enemy == 'shield':
+                self.cow2['health'] -= self.r() * self.cow1['attack'] / self.cow2['defense']
+                self.cow1['charge'] += self.r() * self.cow1['defense'] / self.cow2['attack']
+                self.cow2['charge'] += self.r() * 4 * self.cow2['defense'] / self.cow1['attack']
+                message = 'You hit the enemy\'s shield!'
+            elif enemy == 'nuke':
+                self.cow1['health'] -= self.r() * self.cow2['attack']
+                message = 'The enemy nuked you!'
+                self.cow2['charge'] = 0
+        elif command == 'shield':
+            if enemy == 'hit':
+                self.cow1['health'] -= self.r() * self.cow2['attack'] / self.cow1['defense']
+                self.cow2['charge'] += self.r() * self.cow2['defense'] / self.cow1['attack']
+                self.cow1['charge'] += self.r() * 4 * self.cow1['defense'] / self.cow2['attack']
+                message = 'The enemy hit your shield!'
+            elif enemy == 'shield':
+                self.cow1['charge'] += self.r() * self.cow1['defense']
+                self.cow2['charge'] += self.r() * self.cow2['defense']
+                message = 'You both shielded!'
+            elif enemy == 'nuke':
+                self.cow1['health'] -= self.r() * 8 * self.cow2['attack'] / self.cow1['defense']
+                message = 'The enemy nuked your shield!'
+                self.cow2['charge'] = 0
+        elif command == 'nuke':
+            self.cow1['charge'] = 0
+            if enemy == 'hit':
+                self.cow2['health'] -= self.r() * self.cow1['attack']
+                message = 'You nuked the enemy!'
+            elif enemy == 'shield':
+                self.cow2['health'] -= self.r() * 8 * self.cow1['attack'] / self.cow2['defense']
+                message = 'You nuked the enemy\'s shield!'
+            elif enemy == 'nuke':
+                self.cow1['health'] -= self.r() * self.cow2['attack']
+                self.cow2['health'] -= self.r() * self.cow1['attack']
+                message = 'You both nuked each other!'
+                self.cow2['charge'] = 0
+        if self.cow1['health'] <= 0 or self.cow2['health'] <= 0:
+            self.end(2 if self.cow1['health'] <= 0 else 0, 2 if self.cow2['health'] <= 0 else 0)
+            return
+        self.update(message)
+
 
 
 
