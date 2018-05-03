@@ -70,10 +70,10 @@ def init(user):
         set_dict(mode)
 
 
-ER_DESIRED = 0.0001
+ER_DESIRED = 0.0025
 # Desired 1cb = Xu
 
-ER_MAX = 0.01
+ER_MAX = 0.25
 # Highest 1cb = Xu
 
 NORM_MONEY = 10000000
@@ -105,7 +105,6 @@ def universal():
 
 class Class(discord.Client):
 
-    waiting = False
 
     @asyncio.coroutine
     def on_ready(self):
@@ -250,11 +249,13 @@ class Class(discord.Client):
                 if command == 'buy':
                     if d[p]['money'] >= 500:
                         d[p]['cow'] = {
-                            'attack': 0,
+                            'attack': 10,
                             'charge': 0,
-                            'defense': 0,
+                            'defense': 10,
                             'health': 20,
-                            'size': 10
+                            'level': 0,
+                            'size': 10,
+                            'xp': 0
                         }
                         difference = -500
                         yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
@@ -276,7 +277,7 @@ class Class(discord.Client):
                             d[p]['cow'] = {}
                             yield from client.send_message(message.channel, 'Your cow exploded!')
                         else:
-                            d[p]['size'] += feed
+                            d[p]['cow']['size'] += feed
                             yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
