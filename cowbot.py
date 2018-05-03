@@ -198,10 +198,10 @@ class Game:
         self.update(message)
 
 
+games = {}
 
 
 class Class(discord.Client):
-
 
     @asyncio.coroutine
     def on_ready(self):
@@ -223,6 +223,33 @@ class Class(discord.Client):
                                            #' said ' + message.content + '`')
             init(p)
         d = get_dict()
+
+        if message.content.startswith('//ll'):
+            d[p]['fight'] = False
+            set_dict(d)
+
+        if not d.get(p, {}) == {} and d[p]['fight']:
+            if message.content.startswith('//'):
+                yield from client.send_message(message.channel, 'You are in a fight right now!')
+                return
+            elif message.content in ['hit', 'shield', 'nuke', 'run']:
+                games[p].turn(message.content)
+                yield from client.delete_message(games[p].previous)
+                games[p].previous = yield from client.send_message(message.channel, '', embed=games[p].embed)
+                if games[p].done:
+                    if games[p].s1 == 0:
+                        yield from client.send_message(message.channel, 'You won the battle!')
+                    elif games[p].s1 == 1:
+                        yield from client.send_message(message.channel, 'You ran from the battle.')
+                    elif games[p].s1 == 2:
+                        d[p]['cow'] = {}
+                        yield from client.send_message(message.channel, 'Your cow was killed in the battle.')
+                    d[p]['fight'] = False
+                    set_dict(d)
+
+        if message.content.startswith('//info '):
+            person = message.mentions[0]
+            print(person.name)
 
         if message.content.startswith('//big '):
             thing = message.content.split('//big ')[1]
@@ -254,13 +281,16 @@ class Class(discord.Client):
             embed = discord.Embed(title='cowbank Leaderboard in kcb', description=out)
             yield from client.send_message(message.channel, '', embed=embed)
 
-        if message.content.startswith('//') and d[p]['fight']:
-            yield from client.send_message(message.channel, 'You are in a fight right now!')
-            return
-
-        if message.content.startswith('//fight'):
+        elif message.content.startswith('//fight'):
+            if d[p]['cow'] == {}:
+                yield from client.send_message(message.channel, 'You don\'t have a cow!')
+                return
             d[p]['fight'] = True
             set_dict(d)
+            games[p] = Game(d[p]['cow'], {'attack': 14, 'charge': 0, 'defense': 9, 'health': 20, 'size': 10},
+                            message.author, message.channel)
+            games[p].update('Fight started!')
+            games[p].previous = yield from client.send_message(message.channel, '', embed=games[p].embed)
 
         elif message.content.startswith('//daily'):
             if d[p]['daily'] != str(date.today()):
