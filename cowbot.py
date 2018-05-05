@@ -28,7 +28,7 @@ def backup():
         json.dump(new, g, indent=2, sort_keys=True)
 
 
-with open('schedules.txt', 'r') as f:
+with open('text/schedules.txt', 'r') as f:
     schedule = f.readlines()
 
 
@@ -419,14 +419,14 @@ class Class(discord.Client):
             set_dict(d)
 
         elif message.content.startswith('//h'):
-            with open('h.txt', 'r') as g:
+            with open('text/h.txt', 'r') as g:
                 embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
 
         elif message.content.startswith('//bh'):
-            with open('bh.txt', 'r') as g:
+            with open('text/bh.txt', 'r') as g:
                 embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
             yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
                                            ' probably in a channel that does not allow bots. Please go to another' +
@@ -434,7 +434,7 @@ class Class(discord.Client):
 
         elif message.content.startswith('//covfefe '):
             target = message.content.split('//covfefe ')[1]
-            with open('covfefe.txt') as covfefe:
+            with open('text/covfefe.txt') as covfefe:
                 lines = covfefe.readlines()
                 tweet = discord.Embed(title='',
                                       description=lines[random.randint(0, 19)].replace('[]', target) + '\n\n' +

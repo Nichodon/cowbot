@@ -1,0 +1,23 @@
+**Cowbot Fight**
+This is REALLY experimental!!!
+Have your cows fight other cows to get some cb.
+While fighting, you cannot do any other commands.
+
+**In a fight**
+`hit`: Hits the opponent
+
+`shield`: Shields yourself and charges up for nuke
+
+`nuke`: If you have enough charge, will do a lot of damage
+
+`run`: You lose the battle but your cow lives
+
+**Cow Pets**
+This is the main way you can spend or get money!
+`//cow <sub>`
+
+Subcommands:
+`buy`: Gets a cow for 500cb, you can only have one cow
+`sell`: Sells your cow based on its health
+`feed`: Spends 5cb to feed, but don't feed too much!
+`size`: Gets the size of your cow
