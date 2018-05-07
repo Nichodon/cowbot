@@ -146,60 +146,117 @@ class Game:
         return random.uniform(0.75, 1.25)
 
     def turn(self, command):
-        if command not in ['hit', 'shield', 'nuke', 'run']:
+        if command not in ['hit', 'shield', 'nuke', 'run', 'dodge']:
             return
         if command == 'nuke' and self.cow1['charge'] < 10:
             return
+        if command == 'dodge' and self.cow1['charge'] < 2:
+            return
         enemy = self.enemy()
+        if enemy == 'dodge' and self.cow2['charge'] < 2:
+            enemy = 'shield'
         message = ''
         if command == 'run' or enemy == 'run':
             self.end(1 if command == 'run' else 0, 1 if enemy == 'run' else 0)
         else:
-            a1 = (self.cow1['health'] / (2 * self.oh1) + 0.5) * self.cow1['attack'] + self.cow1['charge'] / 2
-            a2 = (self.cow2['health'] / (2 * self.oh2) + 0.5) * self.cow2['attack'] + self.cow2['charge'] / 2
+            a1 = self.r() * (self.cow1['attack'] + self.cow1['charge'] / 2) / self.cow2['defense']
+            a2 = self.r() * (self.cow2['attack'] + self.cow2['charge'] / 2) / self.cow1['defense']
+            d1 = self.r() * (self.cow1['defense'] + 5 * self.cow1['health'] / self.oh1) / self.cow2['attack']
+            d2 = self.r() * (self.cow2['defense'] + 5 * self.cow2['health'] / self.oh2) / self.cow1['attack']
             if command == 'hit':
                 if enemy == 'hit':
-                    self.cow1['health'] -= self.r() * 4 * a2 / self.cow1['defense']
-                    self.cow2['health'] -= self.r() * 4 * a1 / self.cow2['defense']
-                    self.cow1['charge'] += self.r() * self.cow1['defense'] / a2
-                    self.cow2['charge'] += self.r() * self.cow2['defense'] / a1
+                    self.cow1['health'] -= a2 * 2
+                    self.cow2['health'] -= a1 * 2
+
                     message = 'You both hit each other!'
                 elif enemy == 'shield':
-                    self.cow2['health'] -= self.r() * a1 / self.cow2['defense']
-                    self.cow1['charge'] += self.r() * self.cow1['defense'] / a2
-                    self.cow2['charge'] += self.r() * 2 * self.cow2['defense'] / a1
-                    message = 'You hit the enemy\'s shield!'
+                    self.cow2['charge'] += d2 * 2
+                    self.cow2['health'] -= a1
+
+                    message = 'The enemy shielded your hit!'
+                elif enemy == 'dodge':
+                    self.cow2['charge'] -= 1
+                    self.cow2['health'] += 1
+
+                    message = 'The enemy dodged your hit!'
                 elif enemy == 'nuke':
-                    self.cow1['health'] -= self.r() * a2
+                    self.cow1['health'] -= a2 * 8
+
                     message = 'The enemy nuked you!'
                     self.cow2['charge'] = 0
             elif command == 'shield':
                 if enemy == 'hit':
-                    self.cow1['health'] -= self.r() * a2 / self.cow1['defense']
-                    self.cow2['charge'] += self.r() * self.cow2['defense'] / a1
-                    self.cow1['charge'] += self.r() * 2 * self.cow1['defense'] / a2
-                    message = 'The enemy hit your shield!'
+                    self.cow1['charge'] += d1 * 2
+                    self.cow1['health'] -= a2
+
+                    message = 'You shielded the enemy\'s hit!'
                 elif enemy == 'shield':
-                    self.cow1['charge'] += self.r() * 4 * self.cow1['defense'] / a2
-                    self.cow2['charge'] += self.r() * 4 * self.cow2['defense'] / a1
+                    self.cow1['charge'] += d1 * 4
+                    self.cow2['charge'] += d2 * 4
+
                     message = 'You both shielded!'
+                elif enemy == 'dodge':
+                    self.cow1['charge'] += d1 * 4
+
+                    self.cow2['charge'] -= 1
+                    self.cow2['health'] += 1
+
+                    message = 'The enemy dodged while you shielded!'
                 elif enemy == 'nuke':
-                    self.cow1['health'] -= self.r() * 8 * a2 / self.cow1['defense']
+                    self.cow1['health'] -= a2 * 4
+
                     message = 'The enemy nuked your shield!'
+                    self.cow2['charge'] = 0
+            elif command == 'dodge':
+                if enemy == 'hit':
+                    self.cow1['charge'] -= 1
+                    self.cow1['health'] += 1
+
+                    message = 'You dodged the enemy\'s hit!'
+                elif enemy == 'shield':
+                    self.cow1['charge'] -= 1
+                    self.cow1['health'] += 1
+
+                    self.cow2['charge'] += d2 * 4
+
+                    message = 'You dodged while the enemy shielded!'
+                elif enemy == 'dodge':
+                    self.cow1['charge'] -= 1
+                    self.cow1['health'] += 1
+
+                    self.cow2['charge'] -= 1
+                    self.cow2['health'] += 1
+
+                    message = 'You both dodged!'
+                elif enemy == 'nuke':
+                    self.cow1['charge'] -= 1
+                    self.cow1['health'] += 10
+
+                    message = 'You dodged the enemy\'s nuke!'
                     self.cow2['charge'] = 0
             elif command == 'nuke':
                 self.cow1['charge'] = 0
                 if enemy == 'hit':
-                    self.cow2['health'] -= self.r() * a1
+                    self.cow2['health'] -= a1 * 8
+
                     message = 'You nuked the enemy!'
                 elif enemy == 'shield':
-                    self.cow2['health'] -= self.r() * 8 * a1 / self.cow2['defense']
+                    self.cow2['health'] -= a1 * 4
+
                     message = 'You nuked the enemy\'s shield!'
+                elif enemy == 'dodge':
+                    self.cow2['charge'] -= 1
+                    self.cow2['health'] += 1
+
+                    message = 'The enemy dodged your nuke!'
                 elif enemy == 'nuke':
-                    self.cow1['health'] -= self.r() * a2
-                    self.cow2['health'] -= self.r() * a1
+                    self.cow1['health'] -= a2 * 8
+                    self.cow2['health'] -= a1 * 8
+
                     message = 'You both nuked each other!'
                     self.cow2['charge'] = 0
+            self.cow1['health'] = self.cow1['health'] if self.cow1['health'] < self.oh1 else self.oh1
+            self.cow2['health'] = self.cow2['health'] if self.cow2['health'] < self.oh2 else self.oh2
             if self.cow1['health'] <= 0 or self.cow2['health'] <= 0:
                 self.end(2 if self.cow1['health'] <= 0 else 0, 2 if self.cow2['health'] <= 0 else 0)
         self.update(message)
@@ -239,7 +296,7 @@ class Class(discord.Client):
             if message.content.startswith('//'):
                 yield from client.send_message(message.channel, 'You are in a fight right now!')
                 return
-            elif message.content in ['hit', 'shield', 'nuke', 'run']:
+            elif message.content in ['hit', 'shield', 'nuke', 'run', 'dodge']:
                 games[p].turn(message.content)
                 yield from client.delete_message(games[p].previous)
                 games[p].previous = yield from client.send_message(message.channel, '', embed=games[p].embed)
