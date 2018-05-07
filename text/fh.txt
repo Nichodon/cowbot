@@ -1,23 +1,26 @@
 **Cowbot Fight**
 This is REALLY experimental!!!
-Have your cows fight other cows to get some cb.
-While fighting, you cannot do any other commands.
+Like, really, really, really experimental!!!!!!
+
+**Getting a cow**
+`//cow buy`: Costs 5kcb FOR NOW (later price will be upped)
+
+`//fight`: Starts a fight. Still in test mode!
 
 **In a fight**
-`hit`: Hits the opponent
+Your cow has two things: `health` and `charge`
+`health`: Is your health, duh
+`charge`: Affects strength and special moves
 
-`shield`: Shields yourself and charges up for nuke
+When in a fight, you can message these words:
 
-`nuke`: If you have enough charge, will do a lot of damage
-
+`hit`: Simple damage
+`shield`: Generates charge, reduces damage
+`nuke`: Uses full charge, lots of damage
+`dodge`: Uses some charge, negates damage, heals
 `run`: You lose the battle but your cow lives
 
-**Cow Pets**
-This is the main way you can spend or get money!
-`//cow <sub>`
-
-Subcommands:
-`buy`: Gets a cow for 500cb, you can only have one cow
-`sell`: Sells your cow based on its health
-`feed`: Spends 5cb to feed, but don't feed too much!
-`size`: Gets the size of your cow
+**THINGS THAT ARE STILL WIP**
+1. You don't get money yet for winning
+2. Cow leveling and xp
+3. More cow features like milking

@@ -28,3 +28,6 @@ Cowbot is made by Nichodon, so yeah.
 
 **Banking**
 Do `//bh` for help on the cowbank
+
+**Cow Pets**
+Do `//fh` for help on the pet system
