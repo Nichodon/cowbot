@@ -450,7 +450,7 @@ class Class(discord.Client):
 
             if d[p]['cow'] == {}:
                 if command == 'buy':
-                    if d[p]['money'] >= 500:
+                    if d[p]['money'] >= 5000:
                         d[p]['cow'] = {
                             'attack': 10,
                             'charge': 0,
@@ -460,8 +460,8 @@ class Class(discord.Client):
                             'size': 10,
                             'xp': 0
                         }
-                        difference = -500
-                        yield from client.send_message(message.channel, 'You spent 500cb to buy a cow.')
+                        difference = -5000
+                        yield from client.send_message(message.channel, 'You spent 5kcb to buy a cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to buy a cow!')
                 else:
@@ -473,21 +473,21 @@ class Class(discord.Client):
                     yield from client.send_message(message.channel, 'Your cow is of the size ' +
                                                    str(d[p]['cow']['size']) + '.')
                 elif command == 'feed':
-                    if d[p]['money'] >= 5:
-                        difference = -5
+                    if d[p]['money'] >= 5000:
+                        difference = -5000
                         feed = random.randint(5, 10)
                         if d[p]['cow']['size'] + feed > 50:
                             d[p]['cow'] = {}
                             yield from client.send_message(message.channel, 'Your cow exploded!')
                         else:
                             d[p]['cow']['size'] += feed
-                            yield from client.send_message(message.channel, 'You spent 5cb to feed your cow.')
+                            yield from client.send_message(message.channel, 'You spent 5kcb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
                 elif command == 'sell':
-                    difference = 500
+                    difference = 500000
                     d[p]['cow'] = {}
-                    yield from client.send_message(message.channel, 'You sold your cow for 500cb.')
+                    yield from client.send_message(message.channel, 'You sold your cow for 500kcb.')
                 else:
                     yield from client.send_message(message.channel, 'Wait what?')
 
