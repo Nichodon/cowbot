@@ -508,6 +508,13 @@ class Class(discord.Client):
                                            ' probably in a channel that does not allow bots. Please go to another' +
                                            ' channel that allows bots.', embed=embed)
 
+        elif message.content.startswith('//fh'):
+            with open('text/fh.txt', 'r') as g:
+                embed = discord.Embed(description=g.read(), colour=discord.Colour(0x00cc99))
+            yield from client.send_message(message.channel, 'If you do not see the help menu below, then you are' +
+                                           ' probably in a channel that does not allow bots. Please go to another' +
+                                           ' channel that allows bots.', embed=embed)
+
         elif message.content.startswith('//covfefe '):
             target = message.content.split('//covfefe ')[1]
             with open('text/covfefe.txt') as covfefe:
