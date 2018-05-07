@@ -130,11 +130,23 @@ class Game:
         self.embed.set_footer(text=message)
 
     def enemy(self):
-        if self.cow2['charge'] >= 10 and random.randint(0, 7) > 0:
-            return 'nuke'
-        if self.cow2['charge'] <= self.cow1['charge'] + random.randint(-2, 2):
-            return 'shield'
-        return 'hit'
+        r1 = ''
+        r2 = ''
+        if self.cow2['charge'] >= 10:
+            r1 = 'hit'
+            r2 = 'nuke'
+        elif self.cow1['charge'] >= 10 or self.cow2['health'] < 10:
+            r1 = 'dodge'
+            r2 = 'shield'
+        elif self.cow1['charge'] > self.cow2['charge']:
+            r1 = 'shield'
+            r2 = 'hit'
+        else:
+            r1 = 'hit'
+            r2 = 'shield'
+        if random.randint(0, 3) == 0:
+            return r1
+        return r2
 
     def end(self, status1, status2):
         self.s1 = status1
