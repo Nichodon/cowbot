@@ -1,6 +1,7 @@
 .idea/
 venv/
 supersecrettoken
+devtoken
 data.txt
 datum.json
 backup.json

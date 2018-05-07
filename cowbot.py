@@ -295,8 +295,8 @@ class Class(discord.Client):
 
         p = message.author.name
         if message.content.startswith('//'):
-            #yield from client.send_message(client.get_channel(id='438372178522669062'), '`' + message.author.name +
-                                           #' said ' + message.content + '`')
+            yield from client.send_message(client.get_channel(id='438372178522669062'), '`' + message.author.name +
+                                           ' said ' + message.content + '`')
             init(p)
         d = get_dict()
 
