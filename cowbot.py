@@ -1,5 +1,5 @@
 import discord
-from time import gmtime, strftime
+from time import gmtime, strftime, time
 from datetime import date
 from discord.utils import *
 import random
@@ -322,6 +322,7 @@ class Class(discord.Client):
                         yield from client.send_message(message.channel, 'Your cow was killed in the battle.')
                     d[p]['fight'] = False
                     set_dict(d)
+                yield from client.delete_message(message)
 
         if message.content.startswith('//info '):
             person = message.mentions[0]
@@ -444,8 +445,6 @@ class Class(discord.Client):
 
         if message.content.startswith('//cow'):
             command = message.content.split(' ')[1]
-            print(command)
-
             difference = 0
 
             if d[p]['cow'] == {}:
@@ -456,6 +455,7 @@ class Class(discord.Client):
                             'charge': 0,
                             'defense': 10,
                             'health': 20,
+                            'milk': 0,
                             'level': 0,
                             'size': 10,
                             'xp': 0
@@ -466,12 +466,11 @@ class Class(discord.Client):
                         yield from client.send_message(message.channel, 'You are too poor to buy a cow!')
                 else:
                     yield from client.send_message(message.channel, 'You don\'t have a cow!')
+
             else:
                 if command == 'buy':
                     yield from client.send_message(message.channel, 'You already have a cow!')
-                elif command == 'size':
-                    yield from client.send_message(message.channel, 'Your cow is of the size ' +
-                                                   str(d[p]['cow']['size']) + '.')
+
                 elif command == 'feed':
                     if d[p]['money'] >= 5000:
                         difference = -5000
@@ -484,12 +483,33 @@ class Class(discord.Client):
                             yield from client.send_message(message.channel, 'You spent 5kcb to feed your cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to feed your cow!')
+
                 elif command == 'sell':
                     difference = 500000
                     d[p]['cow'] = {}
                     yield from client.send_message(message.channel, 'You sold your cow for 500kcb.')
+
+                elif command == 'milk':
+                    if time() - d[p]['cow']['milk'] > 60:
+                        difference = d[p]['cow']['size']
+                        d[p]['cow']['milk'] = time()
+                        d[p]['cow']['size'] -= 5
+                        yield from client.send_message(message.channel, 'You mlked your cow for ' + str(difference) +
+                                                       'kcb.')
+                    else:
+                        yield from client.send_message(message.channel, 'Seriously? Back so soon?')
+
                 else:
                     yield from client.send_message(message.channel, 'Wait what?')
+
+            if d[p]['cow']['size'] < 10:
+                if d[p]['cow']['size'] <= 0:
+                    d[p]['cow'] = {}
+                    yield from client.send_message(message.channel, 'Your cow starved to death!')
+                else:
+                    yield from client.send_message(message.channel, 'Your cow is starving.')
+            elif d[p]['cow']['size'] > 40:
+                yield from client.send_message(message.channel, 'Your cow is a bit obese.')
 
             d[p]['money'] += difference
             set_dict(d)
