@@ -145,8 +145,8 @@ class Game:
             r1 = 'hit'
             r2 = 'shield'
         if random.randint(0, 3) == 0:
-            return r1
-        return r2
+            return r2
+        return r1
 
     def end(self, status1, status2):
         self.s1 = status1
