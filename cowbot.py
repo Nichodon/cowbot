@@ -508,14 +508,15 @@ class Class(discord.Client):
                 else:
                     yield from client.send_message(message.channel, 'Wait what?')
 
-            if d[p]['cow']['size'] < 10:
-                if d[p]['cow']['size'] <= 0:
-                    d[p]['cow'] = {}
-                    yield from client.send_message(message.channel, 'Your cow starved to death!')
-                else:
-                    yield from client.send_message(message.channel, 'Your cow is starving.')
-            elif d[p]['cow']['size'] > 40:
-                yield from client.send_message(message.channel, 'Your cow is a bit obese.')
+            if not d[p]['cow'] == {}:
+                if d[p]['cow']['size'] < 10:
+                    if d[p]['cow']['size'] <= 0:
+                        d[p]['cow'] = {}
+                        yield from client.send_message(message.channel, 'Your cow starved to death!')
+                    else:
+                        yield from client.send_message(message.channel, 'Your cow is starving.')
+                elif d[p]['cow']['size'] > 40:
+                    yield from client.send_message(message.channel, 'Your cow is a bit obese.')
 
             d[p]['money'] += difference
             set_dict(d)
