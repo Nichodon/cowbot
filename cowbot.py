@@ -314,7 +314,12 @@ class Class(discord.Client):
                 games[p].previous = yield from client.send_message(message.channel, '', embed=games[p].embed)
                 if games[p].done:
                     if games[p].s1 == 0:
-                        yield from client.send_message(message.channel, 'You won the battle!')
+                        yield from client.send_message(message.channel, 'You won the battle and got 50kcb!')
+                        d[p]['cow']['xp'] += random.randint(50, 75)
+                        d[p]['money'] += 50
+                        if d[p]['cow']['xp'] > 100 * math.log(d[p]['cow']['xp'] + math.e, math.e):
+                            d[p]['cow']['xp'] = 0
+                            d[p]['cow']['level'] += 1
                     elif games[p].s1 == 1:
                         yield from client.send_message(message.channel, 'You ran from the battle.')
                     elif games[p].s1 == 2:
@@ -449,7 +454,7 @@ class Class(discord.Client):
 
             if d[p]['cow'] == {}:
                 if command == 'buy':
-                    if d[p]['money'] >= 5000:
+                    if d[p]['money'] >= 500000:
                         d[p]['cow'] = {
                             'attack': 10,
                             'charge': 0,
@@ -460,8 +465,8 @@ class Class(discord.Client):
                             'size': 10,
                             'xp': 0
                         }
-                        difference = -5000
-                        yield from client.send_message(message.channel, 'You spent 5kcb to buy a cow.')
+                        difference = -500000
+                        yield from client.send_message(message.channel, 'You spent 500kcb to buy a cow.')
                     else:
                         yield from client.send_message(message.channel, 'You are too poor to buy a cow!')
                 else:
@@ -491,11 +496,12 @@ class Class(discord.Client):
 
                 elif command == 'milk':
                     if time() - d[p]['cow']['milk'] > 60:
-                        difference = d[p]['cow']['size']
+                        output = max(d[p]['cow']['size'] + random.randint(-2, 2), 0)
+                        difference = output * 1000
                         d[p]['cow']['milk'] = time()
                         d[p]['cow']['size'] -= 5
-                        yield from client.send_message(message.channel, 'You mlked your cow for ' + str(difference) +
-                                                       'kcb.')
+                        yield from client.send_message(message.channel, 'You milked your cow for ' +
+                                                       str(output) + 'kcb.')
                     else:
                         yield from client.send_message(message.channel, 'Seriously? Back so soon?')
 
