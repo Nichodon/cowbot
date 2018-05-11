@@ -3,7 +3,9 @@ This is REALLY experimental!!!
 Like, really, really, really experimental!!!!!!
 
 **Getting a cow**
-`//cow buy`: Costs 5kcb FOR NOW (later price will be upped)
+`//cow buy`: Costs 500kcb
+`//cow feed`: Take care of your cow for 5kcb
+`//cow milk`: Milks your cow for cb
 
 `//fight`: Starts a fight. Still in test mode!
 
@@ -21,6 +23,4 @@ When in a fight, you can message these words:
 `run`: You lose the battle but your cow lives
 
 **THINGS THAT ARE STILL WIP**
-1. You don't get money yet for winning
-2. Cow leveling and xp
-3. More cow features like milking
+Cow leveling and xp
